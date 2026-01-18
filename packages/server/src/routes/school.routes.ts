@@ -1,13 +1,8 @@
 import { Router } from "express";
+import { createSchool } from "../controllers/school.controller";
 
 const router = Router();
 
-router.post("/", (req, res) => {
-    res.status(201).json({
-        id: 1,
-        name: req.body.name,
-        address: req.body.address,
-    });
-});
+router.post("/", createSchool);
 
 export default router;

@@ -25,6 +25,14 @@ describe("School API", () => {
 
         expect(res.status).toBe(400);
     });
+
+    it("returns 400 when name is not a string", async () => {
+        const res = await (request(app) as any)
+            .post("/schools")
+            .send({ name: 123 });
+
+        expect(res.status).toBe(400);
+    });
 });
 
 afterEach(async () => {

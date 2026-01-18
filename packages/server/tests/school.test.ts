@@ -17,8 +17,15 @@ describe("School API", () => {
         expect(response.body).toHaveProperty("id");
         expect(response.body.name).toBe("Annur International School");
     });
-});
 
+    it("returns 400 when payload is empty", async () => {
+        const res = await (request(app) as any)
+            .post("/schools")
+            .send({});
+
+        expect(res.status).toBe(400);
+    });
+});
 
 afterEach(async () => {
     await prisma.school.deleteMany();

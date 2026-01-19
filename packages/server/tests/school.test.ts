@@ -61,9 +61,7 @@ describe("School API", () => {
 
         expect(res.status).toBe(409);
         expect(res.body.error).toBe("Conflict");
-    }
-    )
-
+    });
 });
 
 afterEach(async () => {

@@ -47,7 +47,23 @@ describe("School API", () => {
 
         expect(res.status).toBe(500);
         expect(res.body.error).toBe("InternalServerError");
-    })
+    });
+
+    it("returns 409 when school already exists", async () => {
+        await (request(app) as any)
+            .post("/schools")
+            .send({ name: "Duplicate School" })
+            .expect(201);
+
+        const res = await (request(app) as any)
+            .post("/schools")
+            .send({ name: "Duplicate School" });
+
+        expect(res.status).toBe(409);
+        expect(res.body.error).toBe("Conflict");
+    }
+    )
+
 });
 
 afterEach(async () => {

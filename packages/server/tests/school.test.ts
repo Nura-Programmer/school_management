@@ -1,8 +1,7 @@
 import request from 'supertest';
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import app from '../src/app';
 import prisma from '../src/prisma/client';
-
 
 describe("School API", () => {
     it("should create a school", async () => {
@@ -44,8 +43,7 @@ describe("School API", () => {
 
     it("returns 500 with standard error response on unexpected error", async () => {
         const res = await (request(app) as any)
-            .post("/schools")
-            .send(null);
+            .get("/__test__/crash")
 
         expect(res.status).toBe(500);
         expect(res.body.error).toBe("InternalServerError");

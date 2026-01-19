@@ -4,9 +4,9 @@ import prisma from '../prisma/client';
 export const createSchool = async (req: Request, res: Response) => {
     const { name, address } = req.body;
 
-    if (!name || typeof name != "string") {
+    if (!name || typeof name != "string" || name.trim() === "") {
         return res.status(400).json({
-            error: "School name is required and must be a string."
+            error: "Invalid school name"
         });
     }
 

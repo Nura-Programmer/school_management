@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import type { Request, Response, NextFunction } from 'express';
 
 export const errorHandler = (
@@ -7,6 +8,16 @@ export const errorHandler = (
     _next: NextFunction
 ) => {
     console.error(err);
+
+    if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === 'P2002'
+    ) {
+        return res.status(409).json({
+            error: "Conflict",
+            message: "School already exists",
+        });
+    }
 
     res.status(500).json({
         error: "InternalServerError",

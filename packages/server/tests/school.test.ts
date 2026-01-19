@@ -41,6 +41,15 @@ describe("School API", () => {
 
         expect(res.status).toBe(400);
     });
+
+    it("returns 500 with standard error response on unexpected error", async () => {
+        const res = await (request(app) as any)
+            .post("/schools")
+            .send(null);
+
+        expect(res.status).toBe(500);
+        expect(res.body.error).toBe("InternalServerError");
+    })
 });
 
 afterEach(async () => {

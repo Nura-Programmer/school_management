@@ -33,6 +33,14 @@ describe("School API", () => {
 
         expect(res.status).toBe(400);
     });
+
+    it("returns structured valiadation error when name is empty", async () => {
+        const res = await (request(app) as any)
+            .post("/schools")
+            .send({ name: "" });
+
+        expect(res.status).toBe(400);
+    });
 });
 
 afterEach(async () => {

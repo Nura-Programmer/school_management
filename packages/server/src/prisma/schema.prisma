@@ -13,8 +13,18 @@ datasource db {
 }
 
 model School {
-  id        String   @id @default(uuid())
-  name      String   @unique
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
   address   String
+  createdAt DateTime  @default(now())
+  teachers  Teacher[]
+}
+
+model Teacher {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  surname   String
+  schoolId  Int
+  school    School   @relation(fields: [schoolId], references: [id])
   createdAt DateTime @default(now())
 }

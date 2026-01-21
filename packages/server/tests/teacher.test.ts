@@ -3,7 +3,7 @@ import request from "supertest";
 import app from "../src/app";
 
 describe("Teacher API", () => {
-    if ("create a teacher under a school", async () => {
+    it("create a teacher under a school", async () => {
         const response = await request(app)
             .post("/teachers")
             .send({

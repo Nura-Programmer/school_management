@@ -1,5 +1,6 @@
 import express from 'express';
 import schoolRoutes from './routes/school.routes';
+import teacherRoutes from './routes/teacher.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 import testRoutes from "../tests/__test__.routes";
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 app.use('/schools', schoolRoutes);
+app.use('/teachers', teacherRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello, School Management System!');

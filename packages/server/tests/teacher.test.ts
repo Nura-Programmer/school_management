@@ -69,6 +69,34 @@ describe("Teacher API", () => {
 
         expect(response.status).toBe(404);
     });
+
+    it("returns 409 if teacher already exists in the same school", async () => {
+        const schoolRes = await request(app)
+            .post("/schools")
+            .send({
+                name: "Annur International School",
+                address: "address of inter school"
+            }).expect(201);
+
+        await request(app)
+            .post("/teachers")
+            .send({
+                firstName: "Ali",
+                surname: "Musa",
+                schoolId: schoolRes.body.id
+            }).expect(201);
+
+        const duplocateRes = await request(app)
+            .post("/teachers")
+            .send({
+                firstName: "Ali",
+                surname: "Musa",
+                schoolId: schoolRes.body.id
+            });
+
+        expect(duplocateRes.status).toBe(409);
+        expect(duplocateRes.body.error).toBe("Conflict");
+    });
 });
 
 afterEach(async () => {

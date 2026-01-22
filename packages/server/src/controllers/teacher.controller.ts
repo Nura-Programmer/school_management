@@ -13,6 +13,12 @@ export const createTeacher = async (
             schoolId
         } = req.body;
 
+        if (!firstName || !surname || !schoolId) {
+            return res.status(400).json({
+                message: "firstName, surname and schoolId are required."
+            });
+        }
+
         const teacher = await prisma.teacher.create({
             data: {
                 firstName,

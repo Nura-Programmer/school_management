@@ -39,7 +39,14 @@ export const createTeacher = async (
         });
 
         res.status(201).json(teacher);
-    } catch (error) {
+    } catch (error: any) {
+        if (error.code === 'P2002') {
+            return res.status(409).json({
+                error: "Conflict",
+                message: "Teacher already exists in this school"
+            });
+        }
+
         next(error);
     }
 };

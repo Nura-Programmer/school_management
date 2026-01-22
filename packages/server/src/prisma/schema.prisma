@@ -21,4 +21,6 @@ model Teacher {
   schoolId  Int
   createdAt DateTime @default(now())
   school    School   @relation(fields: [schoolId], references: [id])
+
+  @@unique([firstName, surname, schoolId])
 }

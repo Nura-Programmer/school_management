@@ -12,4 +12,10 @@ To run:
 bun run index.ts
 ```
 
-This project was created using `bun init` in bun v1.3.5. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+## MySQL Smoke Test (Optional)
+
+To verify MySQL connectivity:
+```bash
+DATABASE_PROVIDER="mysql"
+bun test mysql.smoke
+```

@@ -19,6 +19,17 @@ export const createTeacher = async (
             });
         }
 
+        const school = await prisma.school.findUnique({
+            where: { id: Number(schoolId) }
+        });
+
+        if (!school) {
+            return res.status(404).json({
+                error: "NotFound",
+                message: "School not found"
+            });
+        }
+
         const teacher = await prisma.teacher.create({
             data: {
                 firstName,

@@ -1,15 +1,23 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import request from "supertest";
 import app from "../src/app";
+import prisma from "../src/prisma/client";
 
 describe("Teacher API", () => {
     it("create a teacher under a school", async () => {
+        const res = await request(app)
+            .post("/schools")
+            .send({
+                name: "Annur International School",
+                address: "address of inter school"
+            }).expect(201);
+
         const response = await request(app)
             .post("/teachers")
             .send({
                 firstName: "Ali",
                 surname: "Musa",
-                schoolId: 1
+                schoolId: res.body.id
             });
 
         expect(response.status).toBe(201);
@@ -61,4 +69,9 @@ describe("Teacher API", () => {
 
         expect(response.status).toBe(404);
     });
+});
+
+afterEach(async () => {
+    await prisma.teacher.deleteMany();
+    await prisma.school.deleteMany();
 });

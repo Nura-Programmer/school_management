@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@prisma/adapter-libsql": "^7.2.0",
+    "@prisma/adapter-mariadb": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "express": "^5.2.1",
     "mysql2": "^3.16.1",

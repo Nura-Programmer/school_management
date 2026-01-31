@@ -3,16 +3,16 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 
 const {
-    DB_HOST,
-    DB_PORT,
-    DB_USER,
-    DB_PASS,
-    DB_NAME
+    DB_HOST = "localhost",
+    DB_PORT = 3306,
+    DB_USER = "root",
+    DB_PASS = "",
+    DB_NAME = "school_management_dev"
 } = process.env;
 
 const adapter = new PrismaMariaDb({
     host: DB_HOST,
-    port: DB_PORT ? +DB_PORT : 3306,
+    port: +DB_PORT,
     user: DB_USER,
     password: DB_PASS,
     database: DB_NAME

@@ -24,7 +24,7 @@ export const getTestPrisma = (): Prisma.TransactionClient => {
     return testPrisma;
 }
 
-export const rollbackTestTransaction = () => {
+export const rollbackTestTransaction = async () => {
     rollback();
     testPrisma = null;
 }

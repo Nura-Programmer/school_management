@@ -1,9 +1,11 @@
-import type { Request, Response } from 'express';
-import prisma from '../prisma/client';
+import type { NextFunction, Request, Response } from 'express';
+// import prisma from '../prisma/client';
 import { createSchoolSchema } from '../schemas/school.schema';
+import { getPrisma } from '../prisma/getPrisma';
 
-export const createSchool = async (req: Request, res: Response) => {
+export const createSchool = async (req: Request, res: Response, next: NextFunction) => {
     const valiadation = createSchoolSchema.safeParse(req.body);
+    const prisma = getPrisma(req);
 
     if (!valiadation.success) {
         return res.status(400).json({
@@ -12,14 +14,18 @@ export const createSchool = async (req: Request, res: Response) => {
         });
     }
 
-    const { name, address } = valiadation.data;
+    try {
+        const { name, address } = valiadation.data;
 
-    const school = await prisma.school.create({
-        data: {
-            name,
-            address: address ?? ""
-        },
-    });
+        const school = await prisma.school.create({
+            data: {
+                name,
+                address: address ?? ""
+            },
+        });
 
-    res.status(201).json(school);
+        res.status(201).json(school);
+    } catch (error) {
+        next(error);
+    }
 }

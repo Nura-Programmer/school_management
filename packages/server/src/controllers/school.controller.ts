@@ -1,11 +1,9 @@
 import type { NextFunction, Request, Response } from 'express';
-// import prisma from '../prisma/client';
 import { createSchoolSchema } from '../schemas/school.schema';
 import { getPrisma } from '../prisma/getPrisma';
 
 export const createSchool = async (req: Request, res: Response, next: NextFunction) => {
     const valiadation = createSchoolSchema.safeParse(req.body);
-    const prisma = getPrisma(req);
 
     if (!valiadation.success) {
         return res.status(400).json({
@@ -13,6 +11,8 @@ export const createSchool = async (req: Request, res: Response, next: NextFuncti
             details: valiadation.error.flatten
         });
     }
+
+    const prisma = getPrisma(req);
 
     try {
         const { name, address } = valiadation.data;

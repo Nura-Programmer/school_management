@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import prisma from "../prisma/client";
+import { getPrisma } from "../prisma/getPrisma";
 
 export const createTeacher = async (
     req: Request,
@@ -18,6 +18,8 @@ export const createTeacher = async (
                 message: "firstName, surname and schoolId are required."
             });
         }
+
+        const prisma = getPrisma(req);
 
         const school = await prisma.school.findUnique({
             where: { id: Number(schoolId) }

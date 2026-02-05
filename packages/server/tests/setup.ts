@@ -1,21 +1,17 @@
+import { afterEach, beforeAll, beforeEach } from 'vitest';
+import { beginTest, resetTest } from './helpers/testPrisma';
 import { execSync } from 'child_process';
-import { beforeEach, afterEach } from 'vitest';
-import { beginTestTransaction, rollbackTestTransaction } from './helpers/testPrisma';
 
-beforeEach(async () => {
-    await beginTestTransaction();
-});
-
-afterEach(async () => {
-    await rollbackTestTransaction();
-});
-
-export default async () => {
+beforeAll(() => {
     execSync("bun prisma migrate deploy", {
         stdio: 'inherit',
         env: {
             ...process.env,
-            ENV: 'test'
+            ENV: "test"
         }
-    })
-};
+    });
+});
+
+beforeEach(async () => await beginTest());
+
+afterEach(async () => await resetTest());

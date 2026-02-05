@@ -1,16 +1,19 @@
 import request from 'supertest';
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import app from '../src/app';
-import prisma from '../src/prisma/client';
+// import prisma from '../src/prisma/client';
+import { withTestPrisma } from './helpers/withTestPrisma';
 
 describe("School API", () => {
     it("should create a school", async () => {
-        const response = await (request(app) as any)
-            .post("/schools")
-            .send({
-                name: "Annur International School",
-                address: "123 Main St, Cityville",
-            });
+        const response = await withTestPrisma(
+            request(app)
+                .post("/schools")
+                .send({
+                    name: "Annur International School",
+                    address: "123 Main St, Cityville",
+                })
+        );
 
         expect(response.status).toBe(201);
         expect(response.body).toHaveProperty("id");
@@ -18,52 +21,61 @@ describe("School API", () => {
     });
 
     it("returns 400 when payload is empty", async () => {
-        const res = await (request(app) as any)
-            .post("/schools")
-            .send({});
+        const res = await withTestPrisma(
+            request(app)
+                .post("/schools")
+                .send({})
+        );
 
         expect(res.status).toBe(400);
     });
 
     it("returns 400 when name is not a string", async () => {
-        const res = await (request(app) as any)
-            .post("/schools")
-            .send({ name: 123 });
+        const res = await withTestPrisma(
+            request(app)
+                .post("/schools")
+                .send({ name: 123 })
+        );
 
         expect(res.status).toBe(400);
     });
 
     it("returns structured valiadation error when name is empty", async () => {
-        const res = await (request(app) as any)
-            .post("/schools")
-            .send({ name: "" });
+        const res = await withTestPrisma(
+            request(app)
+                .post("/schools")
+                .send({ name: "" })
+        );
 
         expect(res.status).toBe(400);
     });
 
     it("returns 500 with standard error response on unexpected error", async () => {
-        const res = await (request(app) as any)
-            .get("/__test__/crash")
+        const res = await withTestPrisma(
+            request(app)
+                .get("/__test__/crash")
+        );
 
         expect(res.status).toBe(500);
         expect(res.body.error).toBe("InternalServerError");
     });
 
     it("returns 409 when school already exists", async () => {
-        await (request(app) as any)
-            .post("/schools")
-            .send({ name: "Duplicate School" })
-            .expect(201);
+        const schoolRes = await withTestPrisma(
+            request(app)
+                .post("/schools")
+                .send({ name: "Duplicate School" })
+        );
 
-        const res = await (request(app) as any)
-            .post("/schools")
-            .send({ name: "Duplicate School" });
+        expect(schoolRes.status).toBe(201);
+
+        const res = await withTestPrisma(
+            request(app)
+                .post("/schools")
+                .send({ name: "Duplicate School" })
+        );
 
         expect(res.status).toBe(409);
         expect(res.body.error).toBe("Conflict");
     });
-});
-
-afterEach(async () => {
-    await prisma.school.deleteMany();
 });

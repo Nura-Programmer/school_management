@@ -1,6 +1,7 @@
+import type { Request } from "express";
 import prisma from "./client";
 
-export const getPrisma = (req?: any) => {
-    return req?.testPrisma ?? prisma;
+export function getPrisma(req?: Request & { prisma?: typeof prisma }) {
+    return req?.prisma ?? prisma;
 }
 

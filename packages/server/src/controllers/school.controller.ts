@@ -31,7 +31,7 @@ export const createSchool = async (req: Request, res: Response, next: NextFuncti
 }
 
 
-export const listSchools = async (req, res, next) => {
+export const listSchools = async (req: Request, res: Response, next: NextFunction) => {
     const prisma = getPrisma(req);
 
     try {
@@ -39,7 +39,7 @@ export const listSchools = async (req, res, next) => {
         const limit = Number(req.query.limit ?? 10);
         const skip = (page - 1) * limit;
 
-        const [data, total] = await prisma.$transaction([
+        const [data, total = 1] = await prisma.$transaction([
             prisma.school.findMany({
                 skip,
                 take: limit,

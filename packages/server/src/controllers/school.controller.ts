@@ -42,25 +42,26 @@ export const listSchools = async (req: Request, res: Response, next: NextFunctio
     const prisma = getPrisma(req);
 
     try {
-        const page = Number(req.query.page ?? 1);
-        const limit = Number(req.query.limit ?? 10);
+        const page = Math.max(1, parseInt(req.query.page as string) || 1);
+        const limit = Math.max(1, parseInt(req.query.limit as string) || 10);
         const skip = (page - 1) * limit;
 
-        const [data, total = 1] = await prisma.$transaction([
-            prisma.school.findMany({
-                skip,
-                take: limit,
-                orderBy: { createdAt: "desc" }
-            })
-        ]);
+        const schools = await prisma.school.findMany({
+            skip,
+            take: limit + 1,
+            orderBy: [{ createdAt: "desc" }, { id: "desc" }]
+        });
+
+        const hasNext = schools.length > limit;
+
+        if (hasNext) schools.pop();
 
         res.json({
-            data,
+            data: schools,
             meta: {
                 page,
                 limit,
-                total,
-                pages: Math.ceil(total / limit),
+                hasNext
             }
         });
     } catch (err) {

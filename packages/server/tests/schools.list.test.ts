@@ -9,26 +9,25 @@ describe("School listining API", () => {
             request(app)
                 .post("/schools")
                 .send({
-                    name: "A", address: "A"
+                    name: "ASchool", address: "Aschool address"
                 })
         );
         await withTestPrisma(
             request(app)
                 .post("/schools")
                 .send({
-                    name: "B", address: "B"
+                    name: "BSchool", address: "Bschool address"
                 })
         );
 
-        const res = await request(app).get("/schools?page=1&limit=1");
+        const { status, body } = await request(app).get("/schools?page=1&limit=1");
 
-        expect(res.status).toBe(200);
-        expect(res.body.data.length).toBe(1);
-        expect(res.body.meta).toEqual({
+        expect(status).toBe(200);
+        expect(body.data.length).toBe(1);
+        expect(body.meta).toEqual({
             page: 1,
             limit: 1,
-            total: 2,
-            pages: 2
+            hasNext: true,
         });
     })
 })

@@ -25,7 +25,14 @@ export const createSchool = async (req: Request, res: Response, next: NextFuncti
         });
 
         res.status(201).json(school);
-    } catch (error) {
+    } catch (error: any) {
+        if (error.code === 'P2002') {
+            return res.status(409).json({
+                error: "Conflict",
+                message: "School already exist."
+            });
+        }
+
         next(error);
     }
 }

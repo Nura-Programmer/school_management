@@ -12,6 +12,7 @@ model School {
   address   String    @db.VarChar(255)
   createdAt DateTime  @default(now())
   teachers  Teacher[]
+  classes   Class[]
 }
 
 model Teacher {
@@ -23,4 +24,13 @@ model Teacher {
   school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
   @@unique([firstName, surname, schoolId])
+}
+
+model Class {
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(100)
+  schoolId Int
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([name, schoolId])
 }

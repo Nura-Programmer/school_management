@@ -52,3 +52,44 @@ export const createTeacher = async (
         next(error);
     }
 };
+
+export const listTeachers = async (req: Request, res: Response, next: NextFunction) => {
+    const prisma = getPrisma(req);
+
+    try {
+        const schoolId = req.query.schoolId as string;
+        if (!schoolId) {
+            return res.status(400).json({
+                error: "ValidationError",
+                message: "schoolId query parameter is required."
+            });
+        }
+
+        const page = Math.max(1, parseInt(req.query.page as string) || 1);
+        const limit = Math.max(1, parseInt(req.query.limit as string) || 10);
+        const skip = (page - 1) * limit;
+
+        const teachers = await prisma.teacher.findMany({
+            where: {
+                schoolId: Number(schoolId)
+            },
+            skip,
+            take: limit + 1,
+            orderBy: [{ createdAt: "desc" }, { id: "desc" }]
+        });
+
+        const hasNext = teachers.length > limit;
+        if (hasNext) teachers.pop();
+
+        res.status(200).json({
+            data: teachers,
+            meta: {
+                page,
+                limit,
+                hasNext
+            }
+        });
+    } catch (error: any) {
+        next(error);
+    }
+};

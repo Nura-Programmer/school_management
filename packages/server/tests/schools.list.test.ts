@@ -20,7 +20,7 @@ describe("School listining API", () => {
                 })
         );
 
-        const { status, body } = await request(app).get("/schools?page=1&limit=1");
+        const { status, body } = await withTestPrisma(request(app).get("/schools?page=1&limit=1"));
 
         expect(status).toBe(200);
         expect(body.data.length).toBe(1);

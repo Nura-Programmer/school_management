@@ -15,7 +15,7 @@ describe("Class API", () => {
         );
 
         const response = await withTestPrisma(request
-            (app).post(`/schools/${body.id}`)
+            (app).post(`/schools/${body.id}/classes`)
             .send({
                 name: "JSS 1"
             })

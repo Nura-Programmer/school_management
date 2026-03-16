@@ -25,4 +25,62 @@ describe("Class API", () => {
         expect(response.body).toHaveProperty("id");
         expect(response.body.name).toBe("JSS 1");
     });
+
+    it("returns 400 when payload is empty", async () => {
+        const res = await withTestPrisma(
+            request(app)
+                .post("/schools/1/classes")
+                .send({})
+        );
+
+        expect(res.status).toBe(400);
+    });
+
+    it("returns 400 when name is not a string", async () => {
+        const res = await withTestPrisma(
+            request(app)
+                .post("/schools/1/classes")
+                .send({ name: 123 })
+        );
+
+        expect(res.status).toBe(400);
+    });
+
+    it("returns structured valiadation error when name is empty", async () => {
+        const res = await withTestPrisma(
+            request(app)
+                .post("/schools/1/classes")
+                .send({ name: "" })
+        );
+
+        expect(res.status).toBe(400);
+    });
+
+    it("returns 409 when class already exist under the school", async () => {
+        const { body } = await withTestPrisma(
+            request(app)
+                .post("/schools")
+                .send({
+                    name: "Annur International School",
+                    address: "123 Main St, Cityville",
+                })
+        );
+
+        await withTestPrisma(request
+            (app).post(`/schools/${body.id}/classes`)
+            .send({
+                name: "Duplicate class"
+            })
+        );
+
+        const res = await withTestPrisma(request
+            (app).post(`/schools/${body.id}/classes`)
+            .send({
+                name: "Duplicate class"
+            })
+        );
+
+        expect(res.status).toBe(409);
+        expect(res.body.error).toBe("Conflict");
+    });
 })

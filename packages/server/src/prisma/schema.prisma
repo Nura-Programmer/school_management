@@ -7,15 +7,17 @@ datasource db {
 }
 
 model School {
+  @@map("schools")
   id        Int       @id @default(autoincrement())
   name      String    @unique @db.VarChar(191)
   address   String    @db.VarChar(255)
   createdAt DateTime  @default(now())
   teachers  Teacher[]
-  classes   Class[]
+  classes   ClassModel[]
 }
 
 model Teacher {
+@@map("teachers")
   id        Int      @id @default(autoincrement())
   firstName String   @db.VarChar(100)
   surname   String   @db.VarChar(100)
@@ -26,7 +28,8 @@ model Teacher {
   @@unique([firstName, surname, schoolId])
 }
 
-model Class {
+model ClassModel {
+  @@map("classes")
   id       Int    @id @default(autoincrement())
   name     String @db.VarChar(100)
   schoolId Int

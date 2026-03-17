@@ -36,3 +36,32 @@ export const createClass = async (req: Request, res: Response, next: NextFunctio
         next(error);
     }
 }
+
+export const listClasses = async (req: Request, res: Response, next: NextFunction) => {
+    const prisma = getPrisma(req);
+
+    try {
+        const page = Math.max(1, parseInt(req.query.page as string) || 1);
+        const limit = Math.max(1, parseInt(req.query.limit as string) || 1);
+        const skip = (page - 1) * limit;
+
+        const classes = await prisma.classModel.findMany({
+            skip, take: limit + 1, orderBy: [
+                { id: "desc" }
+            ]
+        });
+
+        const hasNext = classes.length > limit;
+
+        if (hasNext) classes.pop();
+
+        res.json({
+            data: classes,
+            meta: {
+                page, limit, hasNext
+            }
+        });
+    } catch (err) {
+        next(err)
+    }
+}

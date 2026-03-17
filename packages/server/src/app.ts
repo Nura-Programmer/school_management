@@ -1,6 +1,5 @@
 import express from 'express';
 import schoolRoutes from './routes/school.routes';
-import teacherRoutes from './routes/teacher.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 import testRoutes from "../tests/__test__.routes";
@@ -12,15 +11,14 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/schools', schoolRoutes);
-app.use('/teachers', teacherRoutes);
+app.use('/api/schools', schoolRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hello, School Management System!');
 });
 
 if (process.env.ENV === 'test') {
-    app.use('/__test__', testRoutes);
+    app.use('/api/__test__', testRoutes);
 }
 
 // Must be the last middleware

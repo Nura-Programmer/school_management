@@ -7,11 +7,8 @@ export const createTeacher = async (
     next: NextFunction
 ) => {
     try {
-        const {
-            firstName,
-            surname,
-            schoolId
-        } = req.body;
+        const { firstName, surname } = req.body;
+        const schoolId = Number(req.params.schoolId);
 
         if (!firstName || !surname || !schoolId) {
             return res.status(400).json({
@@ -57,7 +54,7 @@ export const listTeachers = async (req: Request, res: Response, next: NextFuncti
     const prisma = getPrisma(req);
 
     try {
-        const schoolId = req.query.schoolId as string;
+        const { schoolId } = req.params;
         if (!schoolId) {
             return res.status(400).json({
                 error: "ValidationError",
@@ -81,7 +78,7 @@ export const listTeachers = async (req: Request, res: Response, next: NextFuncti
         const hasNext = teachers.length > limit;
         if (hasNext) teachers.pop();
 
-        res.status(200).json({
+        res.json({
             data: teachers,
             meta: {
                 page,

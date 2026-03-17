@@ -22,6 +22,7 @@ export const resetTest = async () => {
 
     await prisma.school.deleteMany();
     await prisma.teacher.deleteMany();
+    await prisma.classModel.deleteMany();
 
     testPrisma = null;
 }

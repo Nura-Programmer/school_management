@@ -1,42 +1,49 @@
 import { describe, it, expect } from "vitest";
-import request from "supertest";
+import request, { type Test } from "supertest";
 import app from "../src/app";
 import { withTestPrisma } from "./helpers/withTestPrisma";
 
-describe("Teacher API", () => {
+describe("Teacher API", async () => {
+
     it("create a teacher under a school", async () => {
-        const schoolRes = await withTestPrisma(
+        const school = await withTestPrisma(
             request(app)
-                .post("/schools")
+                .post("/api/schools")
                 .send({
                     name: "Annur Local School",
                     address: "address of Local school"
                 })
         );
-
         const res = await withTestPrisma(
             request(app)
-                .post("/teachers")
+                .post(`/api/schools/${school.body.id}/teachers`)
                 .send({
                     firstName: "teacherFirstName",
-                    surname: "teacherSurname",
-                    schoolId: schoolRes.body.id
+                    surname: "teacherSurname"
                 })
         );
 
-        expect(schoolRes.status).toBe(201);
+        expect(school.status).toBe(201);
         expect(res.status).toBe(201);
         expect(res.body).toHaveProperty("id");
         expect(res.body.firstName).toBe("teacherFirstName");
     });
 
     it("returns 400 if firstName is missing", async () => {
+        const school = await withTestPrisma(
+            request(app)
+                .post("/api/schools")
+                .send({
+                    name: "Annur Local School",
+                    address: "address of Local school"
+                })
+        );
         const response = await withTestPrisma(
             request(app)
-                .post("/teachers")
+                .post(`/api/schools/${school.body.id}/teachers`)
                 .send({
                     surname: "Musa",
-                    schoolId: 1
+                    schoolId: school.body.id
                 })
         );
 
@@ -44,12 +51,21 @@ describe("Teacher API", () => {
     });
 
     it("returns 400 if surname is missing", async () => {
+        const school = await withTestPrisma(
+            request(app)
+                .post("/api/schools")
+                .send({
+                    name: "Annur Local School",
+                    address: "address of Local school"
+                })
+        );
+
         const response = await withTestPrisma(
             request(app)
-                .post("/teachers")
+                .post(`/api/schools/${school.body.id}/teachers`)
                 .send({
                     firstName: "Ali",
-                    schoolId: 1
+                    schoolId: school.body.id
                 })
         );
 
@@ -59,7 +75,7 @@ describe("Teacher API", () => {
     it("returns 400 if schoolId is missing", async () => {
         const response = await withTestPrisma(
             request(app)
-                .post("/teachers")
+                .post(`/api/schools/ /teachers`)
                 .send({
                     firstName: "Ali",
                     surname: "Musa"
@@ -72,11 +88,10 @@ describe("Teacher API", () => {
     it("returns 404 if school does not exist", async () => {
         const response = await withTestPrisma(
             request(app)
-                .post("/teachers")
+                .post(`/api/schools/999/teachers`)
                 .send({
                     firstName: "Ali",
-                    surname: "Musa",
-                    schoolId: 9999
+                    surname: "Musa"
                 })
         );
 
@@ -84,36 +99,33 @@ describe("Teacher API", () => {
     });
 
     it("returns 409 if teacher already exists in the same school", async () => {
-        const schoolRes = await withTestPrisma(
+        const school = await withTestPrisma(
             request(app)
-                .post("/schools")
+                .post("/api/schools")
                 .send({
-                    name: "Annur Tech",
-                    address: "address of Tech"
+                    name: "Annur Local School",
+                    address: "address of Local school"
                 })
         );
 
         await withTestPrisma(
             request(app)
-                .post("/teachers")
+                .post(`/api/schools/${school.body.id}/teachers`)
                 .send({
                     firstName: "Ali",
-                    surname: "Musa",
-                    schoolId: schoolRes.body.id
+                    surname: "Musa"
                 })
         );
 
         const duplicateRes = await withTestPrisma(
             request(app)
-                .post("/teachers")
+                .post(`/api/schools/${school.body.id}/teachers`)
                 .send({
                     firstName: "Ali",
-                    surname: "Musa",
-                    schoolId: schoolRes.body.id
+                    surname: "Musa"
                 })
         );
 
-        expect(schoolRes.status).toBe(201);
         expect(duplicateRes.status).toBe(409);
         expect(duplicateRes.body.error).toBe("Conflict");
     });

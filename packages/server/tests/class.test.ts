@@ -5,9 +5,9 @@ import app from "../src/app";
 
 describe("Class API", () => {
     it("Schould create a class under a school", async () => {
-        const { body } = await withTestPrisma(
+        const school = await withTestPrisma(
             request(app)
-                .post("/schools")
+                .post("/api/schools")
                 .send({
                     name: "Annur International School",
                     address: "123 Main St, Cityville",
@@ -15,7 +15,7 @@ describe("Class API", () => {
         );
 
         const response = await withTestPrisma(request
-            (app).post(`/schools/${body.id}/classes`)
+            (app).post(`/api/schools/${school.body.id}/classes`)
             .send({
                 name: "JSS 1"
             })
@@ -29,7 +29,7 @@ describe("Class API", () => {
     it("returns 400 when payload is empty", async () => {
         const res = await withTestPrisma(
             request(app)
-                .post("/schools/1/classes")
+                .post("/api/schools/1/classes")
                 .send({})
         );
 
@@ -39,7 +39,7 @@ describe("Class API", () => {
     it("returns 400 when name is not a string", async () => {
         const res = await withTestPrisma(
             request(app)
-                .post("/schools/1/classes")
+                .post("/api/schools/1/classes")
                 .send({ name: 123 })
         );
 
@@ -49,7 +49,7 @@ describe("Class API", () => {
     it("returns structured valiadation error when name is empty", async () => {
         const res = await withTestPrisma(
             request(app)
-                .post("/schools/1/classes")
+                .post("/api/schools/1/classes")
                 .send({ name: "" })
         );
 
@@ -57,9 +57,9 @@ describe("Class API", () => {
     });
 
     it("returns 409 when class already exist under the school", async () => {
-        const { body } = await withTestPrisma(
+        const school = await withTestPrisma(
             request(app)
-                .post("/schools")
+                .post("/api/schools")
                 .send({
                     name: "Annur International School",
                     address: "123 Main St, Cityville",
@@ -67,14 +67,14 @@ describe("Class API", () => {
         );
 
         await withTestPrisma(request
-            (app).post(`/schools/${body.id}/classes`)
+            (app).post(`/api/schools/${school.body.id}/classes`)
             .send({
                 name: "Duplicate class"
             })
         );
 
         const res = await withTestPrisma(request
-            (app).post(`/schools/${body.id}/classes`)
+            (app).post(`/api/schools/${school.body.id}/classes`)
             .send({
                 name: "Duplicate class"
             })

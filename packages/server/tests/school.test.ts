@@ -8,7 +8,7 @@ describe("School API", () => {
     it("should create a school", async () => {
         const response = await withTestPrisma(
             request(app)
-                .post("/schools")
+                .post("/api/schools")
                 .send({
                     name: "Annur International School",
                     address: "123 Main St, Cityville",
@@ -23,7 +23,7 @@ describe("School API", () => {
     it("returns 400 when payload is empty", async () => {
         const res = await withTestPrisma(
             request(app)
-                .post("/schools")
+                .post("/api/schools")
                 .send({})
         );
 
@@ -33,7 +33,7 @@ describe("School API", () => {
     it("returns 400 when name is not a string", async () => {
         const res = await withTestPrisma(
             request(app)
-                .post("/schools")
+                .post("/api/schools")
                 .send({ name: 123 })
         );
 
@@ -43,7 +43,7 @@ describe("School API", () => {
     it("returns structured valiadation error when name is empty", async () => {
         const res = await withTestPrisma(
             request(app)
-                .post("/schools")
+                .post("/api/schools")
                 .send({ name: "" })
         );
 
@@ -53,7 +53,7 @@ describe("School API", () => {
     it("returns 500 with standard error response on unexpected error", async () => {
         const res = await withTestPrisma(
             request(app)
-                .get("/__test__/crash")
+                .get("/api/__test__/crash")
         );
 
         expect(res.status).toBe(500);
@@ -63,7 +63,7 @@ describe("School API", () => {
     it("returns 409 when school already exists", async () => {
         const schoolRes = await withTestPrisma(
             request(app)
-                .post("/schools")
+                .post("/api/schools")
                 .send({ name: "Duplicate School" })
         );
 
@@ -71,7 +71,7 @@ describe("School API", () => {
 
         const res = await withTestPrisma(
             request(app)
-                .post("/schools")
+                .post("/api/schools")
                 .send({ name: "Duplicate School" })
         );
 

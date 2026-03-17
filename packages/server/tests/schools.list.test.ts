@@ -7,24 +7,24 @@ describe("School listining API", () => {
     it("returns paginated schools", async () => {
         await withTestPrisma(
             request(app)
-                .post("/schools")
+                .post("/api/schools")
                 .send({
                     name: "ASchool", address: "Aschool address"
                 })
         );
         await withTestPrisma(
             request(app)
-                .post("/schools")
+                .post("/api/schools")
                 .send({
                     name: "BSchool", address: "Bschool address"
                 })
         );
 
-        const { status, body } = await withTestPrisma(request(app).get("/schools?page=1&limit=1"));
+        const schools = await withTestPrisma(request(app).get("/api/schools?page=1&limit=1"));
 
-        expect(status).toBe(200);
-        expect(body.data.length).toBe(1);
-        expect(body.meta).toEqual({
+        expect(schools.status).toBe(200);
+        expect(schools.body.data.length).toBe(1);
+        expect(schools.body.meta).toEqual({
             page: 1,
             limit: 1,
             hasNext: true,

@@ -1,9 +1,7 @@
-import request from "supertest";
 import { describe, expect, it } from "vitest";
-import { withTestPrisma } from "./helpers/withTestPrisma";
-import app from "../src/app";
 import schoolMocks from "./common/schools.mocks";
 import classMocks from "./common/classes.mocks";
+import subjectMocks from "./common/subjects.mocks";
 
 describe("Subjects API", () => {
     const { info: schoolInfo } = schoolMocks;
@@ -19,11 +17,13 @@ describe("Subjects API", () => {
         expect(classResonse.status).toBe(201);
         expect(classResonse.body).toHaveProperty("id");
 
-        const subjectResponse = await withTestPrisma(request(app).post(
-            `/api/schools/${school.body.id}/classes/${classResonse.body.id}/subjects`
-        ));
+        const subjectResponse = await subjectMocks.create({
+            schoolId: school.body.id,
+            classId: classResonse.body.id,
+            name: subjectMocks.info.name
+        });
         expect(subjectResponse.status).toBe(201);
         expect(subjectResponse.body).toHaveProperty("id");
-        expect(subjectResponse.body.name.toLowarCase()).toBe("mathematics");
+        expect(subjectResponse.body.name).toBe(subjectMocks.info.name);
     });
 })

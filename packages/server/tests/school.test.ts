@@ -1,81 +1,48 @@
-import request from 'supertest';
 import { describe, it, expect } from 'vitest';
-import app from '../src/app';
-// import prisma from '../src/prisma/client';
-import { withTestPrisma } from './helpers/withTestPrisma';
+import schoolMocks from './common/schools.mocks';
 
 describe("School API", () => {
-    it("should create a school", async () => {
-        const response = await withTestPrisma(
-            request(app)
-                .post("/api/schools")
-                .send({
-                    name: "Annur International School",
-                    address: "123 Main St, Cityville",
-                })
-        );
+    const { name, address } = schoolMocks.info;
 
-        expect(response.status).toBe(201);
-        expect(response.body).toHaveProperty("id");
-        expect(response.body.name).toBe("Annur International School");
+    it("should create a school", async () => {
+        const res = await schoolMocks.create({ name, address });
+
+        expect(res.status).toBe(201);
+        expect(res.body).toHaveProperty("id");
+        expect(res.body.name).toBe(name);
     });
 
     it("returns 400 when payload is empty", async () => {
-        const res = await withTestPrisma(
-            request(app)
-                .post("/api/schools")
-                .send({})
-        );
+        const res = await schoolMocks.create({});
 
         expect(res.status).toBe(400);
     });
 
     it("returns 400 when name is not a string", async () => {
-        const res = await withTestPrisma(
-            request(app)
-                .post("/api/schools")
-                .send({ name: 123 })
-        );
+        const res = await schoolMocks.create({ name: 123 });
 
         expect(res.status).toBe(400);
     });
 
     it("returns structured valiadation error when name is empty", async () => {
-        const res = await withTestPrisma(
-            request(app)
-                .post("/api/schools")
-                .send({ name: "" })
-        );
+        const res = await schoolMocks.create({ name: "" });
 
         expect(res.status).toBe(400);
     });
 
     it("returns 500 with standard error response on unexpected error", async () => {
-        const res = await withTestPrisma(
-            request(app)
-                .get("/api/__test__/crash")
-        );
+        const res = await schoolMocks.getCrash();
 
         expect(res.status).toBe(500);
         expect(res.body.error).toBe("InternalServerError");
     });
 
     it("returns 409 when school already exists", async () => {
-        const schoolRes = await withTestPrisma(
-            request(app)
-                .post("/api/schools")
-                .send({ name: "Duplicate School" })
-        );
+        const firstResponse = await schoolMocks.create({ name, address });
+        expect(firstResponse.status).toBe(201);
 
-        expect(schoolRes.status).toBe(201);
-
-        const res = await withTestPrisma(
-            request(app)
-                .post("/api/schools")
-                .send({ name: "Duplicate School" })
-        );
-
-        expect(res.status).toBe(409);
-        expect(res.body.error).toBe("Conflict");
+        const secondResponse = await schoolMocks.create({ name, address });
+        expect(secondResponse.status).toBe(409);
+        expect(secondResponse.body.error).toBe("Conflict");
     });
 });

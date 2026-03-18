@@ -1,27 +1,17 @@
 import { describe, it, expect } from "vitest";
-import request from "supertest";
-import app from "../src/app";
-import { withTestPrisma } from "./helpers/withTestPrisma";
+import schoolMocks from "./common/schools.mocks";
 
 describe("School listining API", () => {
+    const { name, address } = schoolMocks.info;
+
     it("returns paginated schools", async () => {
-        await withTestPrisma(
-            request(app)
-                .post("/api/schools")
-                .send({
-                    name: "ASchool", address: "Aschool address"
-                })
-        );
-        await withTestPrisma(
-            request(app)
-                .post("/api/schools")
-                .send({
-                    name: "BSchool", address: "Bschool address"
-                })
-        );
+        const firstSchoolRes = await schoolMocks.create({ name, address });
+        expect(firstSchoolRes.body).toHaveProperty("id");
 
-        const schools = await withTestPrisma(request(app).get("/api/schools?page=1&limit=1"));
+        const secondSchoolRes = await schoolMocks.create({ name: "Second School", address });
+        expect(secondSchoolRes.body).toHaveProperty("id");
 
+        const schools = await schoolMocks.getSchools({ page: 1, limit: 1 });
         expect(schools.status).toBe(200);
         expect(schools.body.data.length).toBe(1);
         expect(schools.body.meta).toEqual({

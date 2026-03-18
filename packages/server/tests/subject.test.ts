@@ -112,4 +112,35 @@ describe("Subjects API", () => {
         expect(secondSubject.status).toBe(409);
         expect(secondSubject.body.error).toBe("Conflict");
     });
+
+    it("returns all subjects under a class", async () => {
+        const school = await schoolMocks.create(schoolInfo);
+        expect(school.status).toBe(201);
+        expect(school.body).toHaveProperty("id");
+
+        const classResponse = await classMocks.create({
+            schoolId: school.body.id,
+            ...classMocks.info
+        });
+        expect(classResponse.status).toBe(201);
+        expect(classResponse.body).toHaveProperty("id");
+
+        const firstSubject = await subjectMocks.create({
+            schoolId: school.body.id,
+            classId: classResponse.body.id,
+            ...subjectMocks.info
+        });
+        expect(firstSubject.status).toBe(201);
+        expect(firstSubject.body).toHaveProperty("id");
+        expect(firstSubject.body.name).toBe(subjectMocks.info.name);
+
+        const secondSubject = await subjectMocks.create({
+            schoolId: school.body.id,
+            classId: classResponse.body.id,
+            name: "computer"
+        });
+        expect(secondSubject.status).toBe(201);
+        expect(secondSubject.body).toHaveProperty("id");
+        expect(secondSubject.body.name).toBe("computer");
+    });
 })

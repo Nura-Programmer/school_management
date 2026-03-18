@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createSchool, listSchools } from "../controllers/school.controller";
 import { createClass, listClasses } from "../controllers/class.controller";
 import { createTeacher, listTeachers } from "../controllers/teacher.controller";
+import { createSubject } from "../controllers/subject.controller";
 
 const router = Router();
 
@@ -13,5 +14,7 @@ router.post("/:schoolId/teachers", createTeacher);
 
 router.get("/:schoolId/classes", listClasses);
 router.post("/:schoolId/classes", createClass);
+
+router.post("/:schoolId/classes/:classId/subjects", createSubject);
 
 export default router;

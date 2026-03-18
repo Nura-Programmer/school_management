@@ -25,7 +25,7 @@ describe("Class API", () => {
         expect(school.body).toHaveProperty("id");
 
         const classResponse = await classMocks.create({
-            schoolId: school.body.name
+            schoolId: school.body.id
         });
         expect(classResponse.status).toBe(400);
     });

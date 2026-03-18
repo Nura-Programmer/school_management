@@ -44,8 +44,10 @@ export const listClasses = async (req: Request, res: Response, next: NextFunctio
         const page = Math.max(1, parseInt(req.query.page as string) || 1);
         const limit = Math.max(1, parseInt(req.query.limit as string) || 1);
         const skip = (page - 1) * limit;
+        const schoolId = Number(req.params.schoolId);
 
         const classes = await prisma.classModel.findMany({
+            where: { schoolId },
             skip, take: limit + 1, orderBy: [
                 { id: "desc" }
             ]

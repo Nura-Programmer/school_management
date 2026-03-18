@@ -11,7 +11,7 @@ router.post("/", createSchool);
 router.get("/:schoolId/teachers", listTeachers)
 router.post("/:schoolId/teachers", createTeacher);
 
-router.get("/:schoolsId/classes", listClasses);
+router.get("/:schoolId/classes", listClasses);
 router.post("/:schoolId/classes", createClass);
 
 export default router;

@@ -1,18 +1,35 @@
 import type { NextFunction, Request, Response } from "express";
 import { getPrisma } from "../prisma/getPrisma";
+import { createSubjectSchema } from "../schemas/subject.schema";
 
 export const createSubject = async (req: Request, res: Response, next: NextFunction) => {
-    const payload: { name: string } = req.body;
-    const classId = Number(req.params.classId)
+    try {
+        const validatePayload = createSubjectSchema.safeParse(req.body);
+        const schoolId = Number(req.params.schoolId);
 
-    const prisma = getPrisma(req);
-
-    const newSubject = await prisma.subject.create({
-        data: {
-            name: payload.name,
-            classId
+        if (!validatePayload.success || !schoolId) {
+            return res.status(400).json({
+                error: "ValidationError",
+                details: validatePayload.error?.flatten
+            });
         }
-    });
 
-    res.status(201).json(newSubject);
+        const prisma = getPrisma(req);
+        const { classId, name } = validatePayload.data;
+
+        const newSubject = await prisma.subject.create({
+            data: { classId, name }
+        });
+
+        res.status(201).json(newSubject);
+    } catch (error: any) {
+        if (error.code === "P2002") {
+            return res.status(409).json({
+                error: "Conflict",
+                message: "Subject already exist under this class."
+            });
+        }
+
+        next(error);
+    }
 }

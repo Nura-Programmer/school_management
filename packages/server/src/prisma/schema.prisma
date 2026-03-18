@@ -45,4 +45,6 @@ model Subject {
   name String @db.VarChar(100)
   classId Int
   class ClassModel @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([name, classId])
 }

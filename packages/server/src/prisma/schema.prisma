@@ -34,6 +34,15 @@ model ClassModel {
   name     String @db.VarChar(100)
   schoolId Int
   school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  subject Subject[]
 
   @@unique([name, schoolId])
+}
+
+model Subject {
+  @@map("subjects")
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(100)
+  classId Int
+  class ClassModel @relation(fields: [classId], references: [id], onDelete: Cascade)
 }

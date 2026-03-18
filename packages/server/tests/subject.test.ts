@@ -142,5 +142,12 @@ describe("Subjects API", () => {
         expect(secondSubject.status).toBe(201);
         expect(secondSubject.body).toHaveProperty("id");
         expect(secondSubject.body.name).toBe("computer");
+
+        const subjects = await subjectMocks.getSubjects({
+            schoolId: school.body.id,
+            classId: classResponse.body.id
+        });
+        expect(subjects.status).toBe(200);
+        expect(subjects.body.length).toBe(2);
     });
 })

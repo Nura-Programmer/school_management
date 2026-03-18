@@ -33,3 +33,17 @@ export const createSubject = async (req: Request, res: Response, next: NextFunct
         next(error);
     }
 }
+
+export const getSubjects = async (req: Request, res: Response, next: NextFunction) => {
+    const { schoolId, classId } = req.params;
+
+    const prisma = getPrisma(req);
+
+    const subjects = await prisma.subject.findMany({
+        where: {
+            classId: Number(classId)
+        }
+    });
+
+    res.status(200).json(subjects);
+}

@@ -8,6 +8,11 @@ type CreateSubjectProps = {
     name?: string | number | null
 }
 
+type GetSubjectsProps = {
+    schoolId?: number | null,
+    classId?: number | null,
+}
+
 const subjectsApi = (
     schoolId?: number | null,
     classId?: number | null
@@ -26,6 +31,13 @@ const subjectMocks = {
                     name,
                     classId
                 })
+        );
+    },
+
+    getSubjects: async ({ schoolId, classId }: GetSubjectsProps) => {
+        return await withTestPrisma(
+            request(app)
+                .get(subjectsApi(schoolId, classId))
         );
     }
 }

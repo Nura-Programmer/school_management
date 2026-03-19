@@ -3,6 +3,7 @@ import { createSchool, listSchools } from "../controllers/school.controller";
 import { createClass, listClasses } from "../controllers/class.controller";
 import { createTeacher, listTeachers } from "../controllers/teacher.controller";
 import { createSubject, getSubjects } from "../controllers/subject.controller";
+import { createStudent } from "../controllers/student.controller";
 
 const router = Router();
 
@@ -17,5 +18,7 @@ router.post("/:schoolId/classes", createClass);
 
 router.get("/:schoolId/classes/:classId/subjects", getSubjects);
 router.post("/:schoolId/classes/:classId/subjects", createSubject);
+
+router.post("/:schoolId/classes/:classId/students", createStudent);
 
 export default router;

@@ -7,18 +7,18 @@ datasource db {
 }
 
 model School {
-  @@map("schools")
-  id        Int       @id @default(autoincrement())
-  name      String    @unique @db.VarChar(191)
-  address   String    @db.VarChar(255)
-  createdAt DateTime  @default(now())
+  id        Int          @id @default(autoincrement())
+  name      String       @unique @db.VarChar(191)
+  address   String       @db.VarChar(255)
+  createdAt DateTime     @default(now())
   teachers  Teacher[]
   classes   ClassModel[]
-  students Student[]
+  students  Student[]
+
+  @@map("schools")
 }
 
 model Teacher {
-@@map("teachers")
   id        Int      @id @default(autoincrement())
   firstName String   @db.VarChar(100)
   surname   String   @db.VarChar(100)
@@ -27,39 +27,57 @@ model Teacher {
   school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
   @@unique([firstName, surname, schoolId])
+  @@map("teachers")
 }
 
 model ClassModel {
-  @@map("classes")
-  id       Int    @id @default(autoincrement())
-  name     String @db.VarChar(100)
+  id       Int       @id @default(autoincrement())
+  name     String    @db.VarChar(100)
   schoolId Int
-  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  school   School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   subjects Subject[]
   students Student[]
 
   @@unique([name, schoolId])
+  @@map("classes")
 }
 
 model Subject {
-  @@map("subjects")
-  id Int @id @default(autoincrement())
-  name String @db.VarChar(100)
+  id      Int        @id @default(autoincrement())
+  name    String     @db.VarChar(100)
   classId Int
-  class ClassModel @relation(fields: [classId], references: [id], onDelete: Cascade)
+  class   ClassModel @relation(fields: [classId], references: [id], onDelete: Cascade)
+  marks   Mark[]
 
   @@unique([name, classId])
+  @@map("subjects")
 }
 
 model Student {
-  @@map("students")
-  id Int @id @default(autoincrement())
-  name String @db.VarChar(100)
-  classType String @db.VarChar(1)
-  classId Int
-  schoolId Int
-  class ClassModel @relation(fields: [classId], references: [id], onDelete: Cascade)
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  id        Int        @id @default(autoincrement())
+  name      String     @db.VarChar(100)
+  classType String     @db.VarChar(1)
+  classId   Int
+  schoolId  Int
+  class     ClassModel @relation(fields: [classId], references: [id], onDelete: Cascade)
+  school    School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  marks     Mark[]
 
   @@unique([name, classType, classId, schoolId])
+  @@map("students")
+}
+
+model Mark {
+  id        Int @id @default(autoincrement())
+  ca        Int
+  test      Int
+  exam      Int
+  studentId Int
+  subjectId Int
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, subjectId])
+  @@map("marks")
 }

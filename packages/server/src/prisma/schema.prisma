@@ -58,7 +58,8 @@ model Student {
   classType String @db.VarChar(1)
   classId Int
   schoolId Int
-
   class ClassModel @relation(fields: [classId], references: [id], onDelete: Cascade)
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([name, classType, classId, schoolId])
 }

@@ -84,7 +84,7 @@ describe("Students API", () => {
         expect(studentResponse.status).toBe(400);
     });
 
-    it("returns 409 when subject already exist under a class", async () => {
+    it("returns 409 when student already exist under a class", async () => {
         const school = await schoolMocks.create(schoolInfo);
         expect(school.status).toBe(201);
         expect(school.body).toHaveProperty("id");
@@ -138,17 +138,17 @@ describe("Students API", () => {
         const secondStudent = await studentMocks.create({
             schoolId: school.body.id,
             classId: classResponse.body.id,
-            name: "computer"
+            name: "nura"
         });
         expect(secondStudent.status).toBe(201);
         expect(secondStudent.body).toHaveProperty("id");
-        expect(secondStudent.body.name).toBe("computer");
+        expect(secondStudent.body.name).toBe("nura");
 
-        const subjects = await studentMocks.getStudents({
+        const student = await studentMocks.getStudents({
             schoolId: school.body.id,
             classId: classResponse.body.id
         });
-        expect(subjects.status).toBe(200);
-        expect(subjects.body.length).toBe(2);
+        expect(student.status).toBe(200);
+        expect(student.body.length).toBe(2);
     });
 })

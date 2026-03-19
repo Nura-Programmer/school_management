@@ -14,6 +14,7 @@ model School {
   createdAt DateTime  @default(now())
   teachers  Teacher[]
   classes   ClassModel[]
+  students Student[]
 }
 
 model Teacher {
@@ -34,7 +35,8 @@ model ClassModel {
   name     String @db.VarChar(100)
   schoolId Int
   school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  subject Subject[]
+  subjects Subject[]
+  students Student[]
 
   @@unique([name, schoolId])
 }
@@ -47,4 +49,16 @@ model Subject {
   class ClassModel @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   @@unique([name, classId])
+}
+
+model Student {
+  @@map("students")
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(100)
+  classType String @db.VarChar(1)
+  classId Int
+  schoolId Int
+
+  class ClassModel @relation(fields: [classId], references: [id], onDelete: Cascade)
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 }

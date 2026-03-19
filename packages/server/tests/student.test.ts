@@ -138,7 +138,8 @@ describe("Students API", () => {
         const secondStudent = await studentMocks.create({
             schoolId: school.body.id,
             classId: classResponse.body.id,
-            name: "nura"
+            name: "nura",
+            classType: "A"
         });
         expect(secondStudent.status).toBe(201);
         expect(secondStudent.body).toHaveProperty("id");

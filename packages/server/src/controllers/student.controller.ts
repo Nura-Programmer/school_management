@@ -38,3 +38,16 @@ export const createStudent = async (req: Request, res: Response, next: NextFunct
         next(error);
     }
 }
+
+export const getAllStudents = async (req: Request, res: Response) => {
+    const prisma = getPrisma(req);
+    const schoolId = Number(req.params.schoolId);
+
+    const students = await prisma.student.findMany({
+        where: {
+            schoolId
+        }
+    });
+
+    res.status(200).json(students);
+}

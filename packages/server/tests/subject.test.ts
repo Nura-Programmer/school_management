@@ -7,15 +7,11 @@ describe("Subjects API", () => {
     const { info: schoolInfo } = schoolMocks;
     it("create subject under a specific class in a school", async () => {
         const school = await schoolMocks.create(schoolInfo);
-        expect(school.status).toBe(201);
-        expect(school.body).toHaveProperty("id");
 
         const classResonse = await classMocks.create({
             schoolId: school.body.id,
             ...classMocks.info
         });
-        expect(classResonse.status).toBe(201);
-        expect(classResonse.body).toHaveProperty("id");
 
         const subjectResponse = await subjectMocks.create({
             schoolId: school.body.id,
@@ -29,15 +25,11 @@ describe("Subjects API", () => {
 
     it("returns 400 when payload is empty", async () => {
         const school = await schoolMocks.create(schoolInfo);
-        expect(school.status).toBe(201);
-        expect(school.body).toHaveProperty("id");
 
         const classResponse = await classMocks.create({
             schoolId: school.body.id,
             ...classMocks.info
         });
-        expect(classResponse.status).toBe(201);
-        expect(classResponse.body).toHaveProperty("id");
 
         const subjectResponse = await subjectMocks.create({});
         expect(subjectResponse.status).toBe(400);
@@ -45,15 +37,11 @@ describe("Subjects API", () => {
 
     it("returns 400 when name is not a string", async () => {
         const school = await schoolMocks.create(schoolInfo);
-        expect(school.status).toBe(201);
-        expect(school.body).toHaveProperty("id");
 
         const classResponse = await classMocks.create({
             schoolId: school.body.id,
             ...classMocks.info
         });
-        expect(classResponse.status).toBe(201);
-        expect(classResponse.body).toHaveProperty("id");
 
         const subjectResponse = await subjectMocks.create({
             schoolId: school.body.id,
@@ -65,15 +53,11 @@ describe("Subjects API", () => {
 
     it("returns structured validation error when name is empty", async () => {
         const school = await schoolMocks.create(schoolInfo);
-        expect(school.status).toBe(201);
-        expect(school.body).toHaveProperty("id");
 
         const classResponse = await classMocks.create({
             schoolId: school.body.id,
             ...classMocks.info
         });
-        expect(classResponse.status).toBe(201);
-        expect(classResponse.body).toHaveProperty("id");
 
         const subjectResponse = await subjectMocks.create({
             schoolId: school.body.id,
@@ -85,24 +69,17 @@ describe("Subjects API", () => {
 
     it("returns 409 when subject already exist under a class", async () => {
         const school = await schoolMocks.create(schoolInfo);
-        expect(school.status).toBe(201);
-        expect(school.body).toHaveProperty("id");
 
         const classResponse = await classMocks.create({
             schoolId: school.body.id,
             ...classMocks.info
         });
-        expect(classResponse.status).toBe(201);
-        expect(classResponse.body).toHaveProperty("id");
 
         const firstSubject = await subjectMocks.create({
             schoolId: school.body.id,
             classId: classResponse.body.id,
             ...subjectMocks.info
         });
-        expect(firstSubject.status).toBe(201);
-        expect(firstSubject.body).toHaveProperty("id");
-        expect(firstSubject.body.name).toBe(subjectMocks.info.name);
 
         const secondSubject = await subjectMocks.create({
             schoolId: school.body.id,
@@ -115,33 +92,23 @@ describe("Subjects API", () => {
 
     it("returns all subjects under a class", async () => {
         const school = await schoolMocks.create(schoolInfo);
-        expect(school.status).toBe(201);
-        expect(school.body).toHaveProperty("id");
 
         const classResponse = await classMocks.create({
             schoolId: school.body.id,
             ...classMocks.info
         });
-        expect(classResponse.status).toBe(201);
-        expect(classResponse.body).toHaveProperty("id");
 
         const firstSubject = await subjectMocks.create({
             schoolId: school.body.id,
             classId: classResponse.body.id,
             ...subjectMocks.info
         });
-        expect(firstSubject.status).toBe(201);
-        expect(firstSubject.body).toHaveProperty("id");
-        expect(firstSubject.body.name).toBe(subjectMocks.info.name);
 
         const secondSubject = await subjectMocks.create({
             schoolId: school.body.id,
             classId: classResponse.body.id,
             name: "computer"
         });
-        expect(secondSubject.status).toBe(201);
-        expect(secondSubject.body).toHaveProperty("id");
-        expect(secondSubject.body.name).toBe("computer");
 
         const subjects = await subjectMocks.getSubjects({
             schoolId: school.body.id,

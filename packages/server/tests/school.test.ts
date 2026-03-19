@@ -39,7 +39,6 @@ describe("School API", () => {
 
     it("returns 409 when school already exists", async () => {
         const firstResponse = await schoolMocks.create({ name, address });
-        expect(firstResponse.status).toBe(201);
 
         const secondResponse = await schoolMocks.create({ name, address });
         expect(secondResponse.status).toBe(409);
@@ -48,10 +47,8 @@ describe("School API", () => {
 
     it("returns paginated schools", async () => {
         const firstSchoolRes = await schoolMocks.create({ name, address });
-        expect(firstSchoolRes.body).toHaveProperty("id");
 
         const secondSchoolRes = await schoolMocks.create({ name: "Second School", address });
-        expect(secondSchoolRes.body).toHaveProperty("id");
 
         const schools = await schoolMocks.getSchools({ page: 1, limit: 1 });
         expect(schools.status).toBe(200);

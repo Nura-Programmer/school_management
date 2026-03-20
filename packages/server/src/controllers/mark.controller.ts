@@ -1,16 +1,16 @@
 import type { NextFunction, Request, Response } from "express";
 import { getPrisma } from "../prisma/getPrisma";
 import { CreateMarkSchema } from "../schemas/mark.schema";
+import Errors from "../errors";
 
 export const createMark = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = new Errors(res, "Mark");
+
     try {
         const validatePayload = CreateMarkSchema.safeParse(req.body);
 
         if (!validatePayload.success) {
-            return res.status(400).json({
-                error: "ValidationError",
-                message: validatePayload.error.flatten
-            });
+            return errors.validation(validatePayload.error.message);
         }
 
         const prisma = getPrisma(req);
@@ -21,6 +21,15 @@ export const createMark = async (req: Request, res: Response, next: NextFunction
             studentId,
             subjectId
         } = validatePayload.data;
+
+        const markExist = await prisma.mark.findFirst({
+            where: {
+                studentId,
+                subjectId
+            }
+        });
+
+        if (markExist) return errors.conflict();
 
         const newMark = await prisma.mark.create({
             data: {
@@ -33,14 +42,9 @@ export const createMark = async (req: Request, res: Response, next: NextFunction
         });
 
         res.status(201).json(newMark);
-    } catch (error: any) {
-        if (error.code === "P2002") {
-            return res.status(409).json({
-                error: "Conflict",
-                message: "Mark already recorded."
-            });
-        }
+    } catch (error) {
+        console.error(error);
 
-        next(error);
+        return errors.server();
     }
 }

@@ -1,39 +1,34 @@
 import type { NextFunction, Request, Response } from 'express';
 import { createSchoolSchema } from '../schemas/school.schema';
 import { getPrisma } from '../prisma/getPrisma';
+import Errors from '../errors';
 
 export const createSchool = async (req: Request, res: Response, next: NextFunction) => {
-    const valiadation = createSchoolSchema.safeParse(req.body);
-
-    if (!valiadation.success) {
-        return res.status(400).json({
-            error: "ValidationError",
-            details: valiadation.error.flatten
-        });
-    }
-
-    const prisma = getPrisma(req);
+    const errors = new Errors(res, "School");
 
     try {
-        const { name, address } = valiadation.data;
+        const validatePayload = createSchoolSchema.safeParse(req.body);
+        if (!validatePayload.success) {
+            return errors.validation(validatePayload.error.message);
+        }
+
+        const prisma = getPrisma(req);
+        const { name, address } = validatePayload.data;
+
+        const schoolExist = await prisma.school.findFirst({
+            where: { name, address }
+        });
+        if (schoolExist) return errors.conflict();
 
         const school = await prisma.school.create({
-            data: {
-                name,
-                address: address ?? ""
-            },
+            data: { name, address: address ?? "" }
         });
 
         res.status(201).json(school);
-    } catch (error: any) {
-        if (error.code === 'P2002') {
-            return res.status(409).json({
-                error: "Conflict",
-                message: "School already exist."
-            });
-        }
+    } catch (error) {
+        console.error(error)
 
-        next(error);
+        return errors.server();
     }
 }
 

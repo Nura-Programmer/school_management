@@ -3,7 +3,7 @@ import { getPrisma } from "../prisma/getPrisma";
 import { CreateMarkSchema } from "../schemas/mark.schema";
 import Errors from "../errors";
 
-export const createMark = async (req: Request, res: Response, next: NextFunction) => {
+export const createMark = async (req: Request, res: Response) => {
     const errors = new Errors(res, "Mark");
 
     try {

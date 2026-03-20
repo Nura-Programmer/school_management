@@ -3,7 +3,7 @@ import { getPrisma } from "../prisma/getPrisma";
 import Errors from "../errors";
 import { createTeacherSchema } from "../schemas/teacher.schema";
 
-export const createTeacher = async (req: Request, res: Response, next: NextFunction) => {
+export const createTeacher = async (req: Request, res: Response) => {
     const errors = new Errors(res, "Teacher");
 
     try {

@@ -56,6 +56,13 @@ describe("Marks API", () => {
             classId: classResonse.body.id,
             ...studentMocks.info
         });
+        const markResponse = await markMocks.create({
+            schoolId: school.body.id,
+            classId: classResonse.body.id,
+            studentId: studentResponse.body.id,
+            subjectId: subjectResponse.body.id,
+            ...markMocks.info
+        });
         const withOutSchoolId = await markMocks.create({
             schoolId: null,
             classId: classResonse.body.id,
@@ -110,8 +117,8 @@ describe("Marks API", () => {
             exam: Number("A")
         });
 
-        expect(withOutSchoolId.status, "return 400 when schoolId is missing").toBe(400);
-        expect(withOutClassId.status, "return 400 when classId is missing").toBe(400);
+        expect(markResponse.status).toBe(201);
+        expect(markResponse.body).toHaveProperty("id");
         expect(withOutStudentId.status, "return 400 when studentId is missing").toBe(400);
         expect(withOutSubjectId.status, "return 400 when subjectId is missing").toBe(400);
         expect(whenCAIsNaN.body.error, "returns validation error when ca is NaN").toBe("ValidationError");

@@ -34,6 +34,13 @@ class Errors {
             message
         });
     }
+
+    notFound = (): Response => {
+        return this.res.status(404).json({
+            error: "NotFound",
+            message: `${this.name} was not found.`
+        });
+    }
 }
 
 export default Errors;

@@ -1,52 +1,42 @@
 import type { Request, Response, NextFunction } from "express";
 import { getPrisma } from "../prisma/getPrisma";
+import Errors from "../errors";
+import { createTeacherSchema } from "../schemas/teacher.schema";
 
-export const createTeacher = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const createTeacher = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = new Errors(res, "Teacher");
+
     try {
-        const { firstName, surname } = req.body;
-        const schoolId = Number(req.params.schoolId);
-
-        if (!firstName || !surname || !schoolId) {
-            return res.status(400).json({
-                message: "firstName, surname and schoolId are required."
-            });
+        const validatePayload = createTeacherSchema.safeParse({
+            schoolId: Number(req.params.schoolId),
+            ...req.body
+        });
+        if (!validatePayload.success) {
+            return errors.validation(validatePayload.error.message);
         }
 
         const prisma = getPrisma(req);
+        const { firstName, surname, schoolId } = validatePayload.data;
 
         const school = await prisma.school.findUnique({
             where: { id: Number(schoolId) }
         });
+        if (!school) return errors.notFound();
 
-        if (!school) {
-            return res.status(404).json({
-                error: "NotFound",
-                message: "School not found"
-            });
-        }
+        const teacherExist = await prisma.teacher.findFirst({
+            where: { schoolId, firstName, surname }
+        });
+        if (teacherExist) return errors.conflict();
 
-        const teacher = await prisma.teacher.create({
-            data: {
-                firstName,
-                surname,
-                schoolId
-            }
+        const newTeacher = await prisma.teacher.create({
+            data: { firstName, surname, schoolId }
         });
 
-        res.status(201).json(teacher);
-    } catch (error: any) {
-        if (error.code === 'P2002') {
-            return res.status(409).json({
-                error: "Conflict",
-                message: "Teacher already exists in this school"
-            });
-        }
+        res.status(201).json(newTeacher);
+    } catch (error) {
+        console.error(error);
 
-        next(error);
+        return errors.server();
     }
 };
 

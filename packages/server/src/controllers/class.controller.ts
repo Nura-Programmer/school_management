@@ -1,39 +1,38 @@
 import type { NextFunction, Request, Response } from "express";
 import { createClassSchema } from "../schemas/class.schema";
 import { getPrisma } from "../prisma/getPrisma";
+import Errors from "../errors";
 
 export const createClass = async (req: Request, res: Response, next: NextFunction) => {
-    const validate = createClassSchema.safeParse(req.body);
-
-    if (!validate.success) {
-        return res.status(400).json({
-            error: "ValidationError",
-            details: validate.error.flatten
-        });
-    }
-
-    const prisma = getPrisma(req);
+    const errors = new Errors(res, "Class");
 
     try {
-        const { name } = validate.data;
+        const validatePayload = createClassSchema.safeParse({
+            ...req.body, schoolId: Number(req.params.schoolId)
+        });
+
+        if (!validatePayload.success) {
+            return errors.validation(validatePayload.error.message);
+        }
+
+        const prisma = getPrisma(req);
+        const { name, schoolId } = validatePayload.data;
+
+        const classExist = await prisma.classModel.findFirst({
+            where: { name, schoolId }
+        });
+
+        if (classExist) return errors.conflict();
 
         const newClass = await prisma.classModel.create({
-            data: {
-                name,
-                schoolId: Number(req.params.schoolId)
-            },
+            data: { name, schoolId }
         });
 
         res.status(201).json(newClass);
-    } catch (error: any) {
-        if (error.code === 'P2002') {
-            return res.status(409).json({
-                error: "Conflict",
-                message: "Class already exist under this school."
-            });
-        }
+    } catch (error) {
+        console.error(error);
 
-        next(error);
+        return errors.server();
     }
 }
 

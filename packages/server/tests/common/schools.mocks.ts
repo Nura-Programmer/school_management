@@ -7,6 +7,12 @@ type CreateSchoolProps = {
     address?: string | null
 }
 
+type UpdateSchoolProps = {
+    id: number,
+    name?: string | number | null,
+    address?: string | null
+}
+
 type GetSchoolProps = {
     page?: number,
     limit?: number
@@ -18,21 +24,37 @@ const schoolMocks = {
     info: {
         name: "Annur International School",
         address: "123 Main St, Cityville",
+        id: null
     },
 
     create: async ({ name, address }: CreateSchoolProps) => {
         return await withTestPrisma(
-            request(app)
-                .post(schoolApi)
-                .send({ name, address })
+            request(app).post(schoolApi).send({ name, address })
         );
     },
 
-    getSchools: async ({page, limit}: GetSchoolProps) => {
+    update: async ({ name, address, id }: UpdateSchoolProps) => {
+        let payload: CreateSchoolProps = {};
+
+        if (name) payload.name = name;
+        if (address) payload.address = address;
+
+        return await withTestPrisma(
+            request(app).put(`${schoolApi}/${id}`).send(payload)
+        );
+    },
+
+    delete: async (id: number) => {
+        return await withTestPrisma(
+            request(app).delete(`${schoolApi}/${id}`).send()
+        );
+    },
+
+    getSchools: async ({ page, limit }: GetSchoolProps) => {
         let params = "";
 
-        if(page) params += `?page=${page}`;
-        if(limit) {
+        if (page) params += `?page=${page}`;
+        if (limit) {
             params += params.length > 0 ? "&" : "?";
             params += `limit=${limit}`;
         }

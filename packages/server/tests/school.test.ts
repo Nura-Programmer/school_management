@@ -59,4 +59,26 @@ describe("School API", () => {
             hasNext: true,
         });
     });
+
+    it("should updates a school", async () => {
+        const school = await schoolMocks.create({ name, address });
+        const { id } = school.body;
+        const updatedInfo = { name: "updatedName", address: "updatedAddress" };
+
+        const updateName = await schoolMocks.update({ id, name: updatedInfo.name });
+        const updateAddress = await schoolMocks.update({ id, address: updatedInfo.address });
+
+        expect(updateName.body.name, "to update school name").toBe(updatedInfo.name);
+        expect(updateAddress.body.address, "to update school address").toBe(updatedInfo.address);
+    });
+
+    it("should delete a school", async () => {
+        const school = await schoolMocks.create({ name, address });
+        const { id } = school.body;
+
+        const deleteSchool = await schoolMocks.delete(id);
+
+        expect(deleteSchool.status).toBe(200);
+        expect(deleteSchool.body.id).toBe(id);
+    })
 });

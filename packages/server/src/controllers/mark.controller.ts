@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
 import { getPrisma } from "../prisma/getPrisma";
 import { CreateMarkSchema } from "../schemas/mark.schema";
 import Errors from "../errors";
@@ -14,21 +14,11 @@ export const createMark = async (req: Request, res: Response) => {
         }
 
         const prisma = getPrisma(req);
-        const {
-            ca,
-            test,
-            exam,
-            studentId,
-            subjectId
-        } = validatePayload.data;
+        const { ca, test, exam, studentId, subjectId } = validatePayload.data;
 
         const markExist = await prisma.mark.findFirst({
-            where: {
-                studentId,
-                subjectId
-            }
+            where: { studentId, subjectId }
         });
-
         if (markExist) return errors.conflict();
 
         const newMark = await prisma.mark.create({

@@ -5,4 +5,10 @@ export const createStudentSchema = z.object({
     classType: z.string().length(1, "Class type must be a single character. e.g A, B, C."),
     classId: z.number(),
     schoolId: z.number()
-})
+});
+
+export const getStudentsSchema = z.object({
+    schoolId: z.number(),
+    page: z.number().optional(),
+    limit: z.number().optional()
+});

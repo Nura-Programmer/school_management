@@ -1,7 +1,7 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Request, Response } from "express";
 import { getPrisma } from "../prisma/getPrisma";
 import Errors from "../errors";
-import { createTeacherSchema } from "../schemas/teacher.schema";
+import { createTeacherSchema, getTeachersSchema } from "../schemas/teacher.schema";
 
 export const createTeacher = async (req: Request, res: Response) => {
     const errors = new Errors(res, "Teacher");
@@ -40,26 +40,28 @@ export const createTeacher = async (req: Request, res: Response) => {
     }
 };
 
-export const listTeachers = async (req: Request, res: Response, next: NextFunction) => {
-    const prisma = getPrisma(req);
+export const listTeachers = async (req: Request, res: Response) => {
+    const errors = new Errors(res, "Teacher");
 
     try {
-        const { schoolId } = req.params;
-        if (!schoolId) {
-            return res.status(400).json({
-                error: "ValidationError",
-                message: "schoolId query parameter is required."
-            });
+        const validatePayload = getTeachersSchema.safeParse({
+            schoolId: Number(req.params.schoolId),
+            page: Number(req.query.page),
+            limit: Number(req.query.limit)
+        });
+        if (!validatePayload.success) {
+            return errors.validation(validatePayload.error.message);
         }
 
-        const page = Math.max(1, parseInt(req.query.page as string) || 1);
-        const limit = Math.max(1, parseInt(req.query.limit as string) || 10);
+        const { data: validated } = validatePayload
+
+        const page = Math.max(1, validated.page || 1);
+        const limit = Math.max(1, validated.limit || 10);
         const skip = (page - 1) * limit;
 
+        const prisma = getPrisma(req);
         const teachers = await prisma.teacher.findMany({
-            where: {
-                schoolId: Number(schoolId)
-            },
+            where: { schoolId: validated.schoolId },
             skip,
             take: limit + 1,
             orderBy: [{ createdAt: "desc" }, { id: "desc" }]
@@ -70,13 +72,11 @@ export const listTeachers = async (req: Request, res: Response, next: NextFuncti
 
         res.json({
             data: teachers,
-            meta: {
-                page,
-                limit,
-                hasNext
-            }
+            meta: { page, limit, hasNext }
         });
-    } catch (error: any) {
-        next(error);
+    } catch (error) {
+        console.error(error);
+
+        return errors.server();
     }
 };

@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { createClassSchema } from "../schemas/class.schema";
+import { createClassSchema, getClassSchema } from "../schemas/class.schema";
 import { getPrisma } from "../prisma/getPrisma";
 import Errors from "../errors";
 
@@ -37,32 +37,42 @@ export const createClass = async (req: Request, res: Response) => {
 }
 
 export const listClasses = async (req: Request, res: Response, next: NextFunction) => {
-    const prisma = getPrisma(req);
+    const errors = new Errors(res, "Class");
 
     try {
-        const page = Math.max(1, parseInt(req.query.page as string) || 1);
-        const limit = Math.max(1, parseInt(req.query.limit as string) || 1);
-        const skip = (page - 1) * limit;
-        const schoolId = Number(req.params.schoolId);
+        const validatePayload = getClassSchema.safeParse({
+            schoolId: Number(req.params.schoolId),
+            page: Number(req.query.page),
+            limit: Number(req.query.limit)
+        });
+        if (!validatePayload.success) {
+            return errors.validation(validatePayload.error.message);
+        }
 
+        const { data: validated } = validatePayload;
+        const page = Math.max(1, validated.page || 1);
+        const limit = Math.max(1, validated.limit || 1);
+        const skip = (page - 1) * limit;
+        const schoolId = validated.schoolId;
+
+        const prisma = getPrisma(req);
         const classes = await prisma.classModel.findMany({
             where: { schoolId },
-            skip, take: limit + 1, orderBy: [
-                { id: "desc" }
-            ]
+            skip,
+            take: limit + 1,
+            orderBy: { id: "desc" }
         });
 
         const hasNext = classes.length > limit;
-
         if (hasNext) classes.pop();
 
         res.json({
             data: classes,
-            meta: {
-                page, limit, hasNext
-            }
+            meta: { page, limit, hasNext }
         });
-    } catch (err) {
-        next(err)
+    } catch (error) {
+        console.error(error);
+
+        return errors.server();
     }
 }

@@ -1,6 +1,6 @@
-import type { NextFunction, Request, Response } from "express"
+import type { Request, Response } from "express"
 import { getPrisma } from "../prisma/getPrisma";
-import { createStudentSchema } from "../schemas/student.schema";
+import { createStudentSchema, getStudentsSchema } from "../schemas/student.schema";
 import Errors from "../errors";
 
 export const createStudent = async (req: Request, res: Response) => {
@@ -33,14 +33,27 @@ export const createStudent = async (req: Request, res: Response) => {
 }
 
 export const getAllStudents = async (req: Request, res: Response) => {
-    const prisma = getPrisma(req);
-    const schoolId = Number(req.params.schoolId);
+    const errors = new Errors(res, "Student");
 
-    const students = await prisma.student.findMany({
-        where: {
-            schoolId
+    try {
+        const validatePayload = getStudentsSchema.safeParse({
+            schoolId: Number(req.params.schoolId)
+        });
+        if (!validatePayload.success) {
+            return errors.validation(validatePayload.error.message);
         }
-    });
 
-    res.status(200).json(students);
+        const prisma = getPrisma(req);
+        const { schoolId } = validatePayload.data;
+
+        const students = await prisma.student.findMany({
+            where: { schoolId }
+        });
+
+        res.status(200).json(students);
+    } catch (error) {
+        console.error(error);
+
+        return errors.server();
+    }
 }

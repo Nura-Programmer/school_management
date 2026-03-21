@@ -1,6 +1,6 @@
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
 import { getPrisma } from "../prisma/getPrisma";
-import { createSubjectSchema } from "../schemas/subject.schema";
+import { createSubjectSchema, getSubjectsSchema } from "../schemas/subject.schema";
 import Errors from "../errors";
 
 export const createSubject = async (req: Request, res: Response) => {
@@ -35,16 +35,29 @@ export const createSubject = async (req: Request, res: Response) => {
     }
 }
 
-export const getSubjects = async (req: Request, res: Response, next: NextFunction) => {
-    const { schoolId, classId } = req.params;
+export const getSubjects = async (req: Request, res: Response) => {
+    const errors = new Errors(res, "Subject");
 
-    const prisma = getPrisma(req);
+    try {
+        const validatePayload = getSubjectsSchema.safeParse({
+            classId: Number(req.params.classId),
 
-    const subjects = await prisma.subject.findMany({
-        where: {
-            classId: Number(classId)
+        });
+        if (!validatePayload.success) {
+            return errors.validation(validatePayload.error.message);
         }
-    });
 
-    res.status(200).json(subjects);
+        const { classId } = validatePayload.data;
+        const prisma = getPrisma(req);
+
+        const subjects = await prisma.subject.findMany({
+            where: { classId: Number(classId) }
+        });
+
+        res.status(200).json(subjects);
+    } catch (error) {
+        console.error(error);
+
+        return errors.server();
+    }
 }

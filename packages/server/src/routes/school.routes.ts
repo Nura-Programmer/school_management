@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createSchool, listSchools } from "../controllers/school.controller";
+import { createSchool, deleteSchool, listSchools, updateSchool } from "../controllers/school.controller";
 import { createClass, listClasses } from "../controllers/class.controller";
 import { createTeacher, listTeachers } from "../controllers/teacher.controller";
 import { createSubject, getSubjects } from "../controllers/subject.controller";
@@ -10,6 +10,8 @@ const router = Router();
 
 router.get("/", listSchools);
 router.post("/", createSchool);
+router.put("/:schoolId", updateSchool);
+router.delete("/:schoolId", deleteSchool);
 
 router.get("/:schoolId/teachers", listTeachers)
 router.post("/:schoolId/teachers", createTeacher);

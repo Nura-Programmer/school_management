@@ -32,6 +32,62 @@ export const createSchool = async (req: Request, res: Response) => {
     }
 }
 
+export const updateSchool = async (req: Request, res: Response) => {
+    const errors = new Errors(res, "School");
+
+    try {
+        const { name, address } = req.body;
+        const schoolId = Number(req.params.schoolId);
+
+        if (!schoolId) return errors.validation("School ID is required.");
+        if (!name && !address) return errors.validation("Name or Address is required.");
+
+        const prisma = getPrisma(req);
+        const schoolExist = await prisma.school.findFirst({
+            where: { id: schoolId }
+        });
+
+        if (!schoolExist) return errors.notFound();
+
+        const updatedSchool = await prisma.school.update({
+            where: { id: schoolId },
+            data: { name, address }
+        });
+
+        res.status(200).json(updatedSchool);
+    } catch (error) {
+        console.error(error);
+
+        return errors.server();
+    }
+}
+
+export const deleteSchool = async (req: Request, res: Response) => {
+    const errors = new Errors(res, "School");
+
+    try {
+        const schoolId = Number(req.params.schoolId);
+        if (!schoolId) return errors.validation("School ID is required.");
+
+        const prisma = getPrisma(req);
+        const schoolExist = await prisma.school.findFirst({
+            where: { id: schoolId }
+        });
+
+        if (!schoolExist) return errors.notFound();
+
+        const deletedSchool = await prisma.school.delete({
+            where: { id: schoolId }
+        });
+
+        res.status(200).json({ id: deletedSchool.id });
+    } catch (error) {
+        console.error(error);
+
+        return errors.server();
+    }
+}
+
 
 export const listSchools = async (req: Request, res: Response) => {
     const errors = new Errors(res, "School");

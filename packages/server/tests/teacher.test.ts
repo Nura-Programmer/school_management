@@ -99,4 +99,41 @@ describe("Teacher API", async () => {
             hasNext: true,
         });
     });
+
+
+    it("should updates a teacher", async () => {
+        const school = await schoolMocks.create(schoolInfo);
+
+        const { info: teacherInfo } = teacherMocks;
+        const teacher = await teacherMocks.create({ schoolId: school.body.id, ...teacherInfo });
+
+        const updatedInfo = { firstName: "updatedFirstName", surname: "updatedSurname" };
+
+        const updateFirstName = await teacherMocks.update({
+            id: teacher.body.id,
+            schoolId: school.body.id,
+            firstName: updatedInfo.firstName
+        });
+
+        const updateSurname = await teacherMocks.update({
+            id: teacher.body.id,
+            schoolId: school.body.id,
+            surname: updatedInfo.surname
+        });
+
+        expect(updateFirstName.body.name, "to update teacher's first name").toBe(updatedInfo.firstName);
+        expect(updateSurname.body.address, "to update teacher's surname").toBe(updatedInfo.surname);
+    });
+
+    it("should delete a teacher", async () => {
+        const school = await schoolMocks.create(schoolInfo);
+
+        const { info: teacherInfo } = teacherMocks;
+        const teacher = await teacherMocks.create({ schoolId: school.body.id, ...teacherInfo });
+
+        const deletedTeacher = await teacherMocks.delete(teacher.body.id, school.body.id);
+
+        expect(deletedTeacher.status).toBe(200);
+        expect(deletedTeacher.body.id).toBe(teacher.body.id);
+    });
 });

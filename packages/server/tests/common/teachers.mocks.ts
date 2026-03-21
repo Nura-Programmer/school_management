@@ -8,6 +8,8 @@ type CreateTeacherProps = {
     schoolId: number | null
 }
 
+type UpdateTeacherProps = { id: number } & CreateTeacherProps;
+
 type GetTeachersProps = {
     schoolId: number,
     page?: number,
@@ -30,11 +32,28 @@ const teacherMocks = {
         );
     },
 
-    getTeachers: async ({schoolId, page, limit}: GetTeachersProps) => {
+    update: async ({ id, schoolId, firstName, surname }: UpdateTeacherProps) => {
+        let payload: UpdateTeacherProps = { id, schoolId };
+
+        if (firstName) payload.firstName = firstName;
+        if (surname) payload.surname = surname;
+
+        return await withTestPrisma(
+            request(app).put(`${teacherApi(schoolId)}/${id}`).send(payload)
+        );
+    },
+
+    delete: async (id: number, schoolId: number) => {
+        return await withTestPrisma(
+            request(app).delete(`${teacherApi(schoolId)}/${id}`).send()
+        );
+    },
+
+    getTeachers: async ({ schoolId, page, limit }: GetTeachersProps) => {
         let params = "";
 
-        if(page) params += `?page=${page}`;
-        if(limit) {
+        if (page) params += `?page=${page}`;
+        if (limit) {
             params += params.length > 0 ? "&" : "?";
             params += `limit=${limit}`;
         }

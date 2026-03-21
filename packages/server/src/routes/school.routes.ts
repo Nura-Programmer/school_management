@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { createSchool, deleteSchool, listSchools, updateSchool } from "../controllers/school.controller";
-import { createClass, listClasses } from "../controllers/class.controller";
+import { createClass, deleteClass, listClasses } from "../controllers/class.controller";
 import { createTeacher, deleteTeacher, listTeachers, updateTeacher } from "../controllers/teacher.controller";
 import { createSubject, getSubjects } from "../controllers/subject.controller";
 import { createStudent, getAllStudents } from "../controllers/student.controller";
@@ -20,6 +20,7 @@ router.delete("/:schoolId/teachers/:teacherId", deleteTeacher);
 
 router.get("/:schoolId/classes", listClasses);
 router.post("/:schoolId/classes", createClass);
+router.delete("/:schoolId/classes/:classId", deleteClass);
 
 router.get("/:schoolId/classes/:classId/subjects", getSubjects);
 router.post("/:schoolId/classes/:classId/subjects", createSubject);

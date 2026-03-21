@@ -40,6 +40,35 @@ export const createTeacher = async (req: Request, res: Response) => {
     }
 };
 
+export const deleteTeacher = async (req: Request, res: Response) => {
+    const errors = new Errors(res, "Teacher");
+
+    try {
+        const { schoolId, teacherId } = req.params;
+
+        if (!schoolId || !teacherId) {
+            return errors.validation("Both School ID and Teacher's ID are required.")
+        }
+
+        const prisma = getPrisma(req);
+        const teacherExist = await prisma.teacher.findFirst({
+            where: { id: Number(teacherId), schoolId: Number(schoolId) }
+        });
+
+        if (!teacherExist) return errors.notFound();
+
+        const deletedTeacher = await prisma.teacher.delete({
+            where: { id: Number(teacherId), schoolId: Number(schoolId) }
+        });
+
+        res.status(200).json({ id: deletedTeacher.id });
+    } catch (error) {
+        console.error(error);
+
+        return errors.server();
+    }
+}
+
 export const listTeachers = async (req: Request, res: Response) => {
     const errors = new Errors(res, "Teacher");
 

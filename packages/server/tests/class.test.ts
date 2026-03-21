@@ -87,4 +87,38 @@ describe("Class API", () => {
             page: 1, limit: 1, hasNext: true
         });
     });
+
+    it("should update a class", async () => {
+        const newName = "updatedName";
+        const school = await schoolMocks.create(schoolInfo);
+
+        const classResponse = await classMocks.create({
+            schoolId: school.body.id,
+            ...classMocks.info
+        });
+
+        const { id: classId, schoolId } = classResponse.body;
+        const updatedName = await classMocks.update({
+            id: classId,
+            schoolId,
+            name: newName
+        });
+
+        expect(updatedName.body.name, "to update class name").toBe(newName);
+    });
+
+    it("should delete a class", async () => {
+        const school = await schoolMocks.create(schoolInfo);
+
+        const classResponse = await classMocks.create({
+            schoolId: school.body.id,
+            ...classMocks.info
+        });
+
+        const { id: classId, schoolId } = classResponse.body;
+        const deletedClass = await classMocks.delete(classId, schoolId);
+
+        expect(deletedClass.status).toBe(200);
+        expect(deletedClass.body.id).toBe(classId);
+    });
 })

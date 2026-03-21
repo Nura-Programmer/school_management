@@ -7,6 +7,8 @@ type CreateClassProps = {
     name?: string | number | null
 }
 
+type UpdateClassProps = { id: number } & CreateClassProps;
+
 type GetClassProps = {
     schoolId: number,
     page?: number,
@@ -25,6 +27,19 @@ const classMocks = {
             request(app)
                 .post(classesApi(schoolId))
                 .send({ name })
+        );
+    },
+
+    update: async ({ id: classId, schoolId, name }: UpdateClassProps) => {
+        return await withTestPrisma(
+            request(app).put(`${classesApi(schoolId)}/${classId}`)
+                .send({ name })
+        );
+    },
+
+    delete: async (classId: number, schoolId: number) => {
+        return await withTestPrisma(
+            request(app).delete(`${classesApi(schoolId)}/${classId}`)
         );
     },
 

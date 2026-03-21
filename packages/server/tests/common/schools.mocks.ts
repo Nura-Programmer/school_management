@@ -7,11 +7,7 @@ type CreateSchoolProps = {
     address?: string | null
 }
 
-type UpdateSchoolProps = {
-    id: number,
-    name?: string | number | null,
-    address?: string | null
-}
+type UpdateSchoolProps = { id: number } & CreateSchoolProps;
 
 type GetSchoolProps = {
     page?: number,
@@ -70,6 +66,5 @@ const schoolMocks = {
         );
     }
 };
-
 
 export default schoolMocks;

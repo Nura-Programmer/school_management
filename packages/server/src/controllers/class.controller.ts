@@ -36,6 +36,35 @@ export const createClass = async (req: Request, res: Response) => {
     }
 }
 
+export const updateClass = async (req: Request, res: Response) => {
+    const errors = new Errors(res, "Class");
+
+    try {
+        const { classId, schoolId } = req.params;
+        const { name } = req.body;
+        if (!classId || !schoolId || !name) {
+            return errors.validation("Both School ID, Class ID and class name are required.");
+        }
+
+        const prisma = getPrisma(req);
+        const classExist = await prisma.classModel.findFirst({
+            where: { id: Number(classId), schoolId: Number(schoolId) }
+        });
+        if (!classExist) return errors.notFound();
+
+        const updatedClass = await prisma.classModel.update({
+            where: { id: Number(classId), schoolId: Number(schoolId) },
+            data: { name }
+        });
+
+        res.status(200).json(updatedClass);
+    } catch (error) {
+        console.error(error);
+
+        return errors.server();
+    }
+}
+
 export const deleteClass = async (req: Request, res: Response) => {
     const errors = new Errors(res, "Class");
 

@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { getPrisma } from "../prisma/getPrisma";
 import Errors from "../errors";
-import { createTeacherSchema, getTeachersSchema } from "../schemas/teacher.schema";
+import { createTeacherSchema, getTeachersSchema, updateTeacherSchema } from "../schemas/teacher.schema";
 
 export const createTeacher = async (req: Request, res: Response) => {
     const errors = new Errors(res, "Teacher");
@@ -39,6 +39,37 @@ export const createTeacher = async (req: Request, res: Response) => {
         return errors.server();
     }
 };
+
+export const updateTeacher = async (req: Request, res: Response) => {
+    const errors = new Errors(res, "Teacher");
+    const { body, params } = req;
+
+    try {
+        const validation = updateTeacherSchema.safeParse({
+            teacherId: Number(params.teacherId),
+            schoolId: Number(params.schoolId),
+            ...body
+        });
+        if (!validation.success) return errors.validation(validation.error.message);
+
+        const { schoolId, teacherId, firstName, surname } = validation.data;
+        if (!firstName && !surname) {
+            return errors.validation("First name or surname is required.");
+        }
+
+        const prisma = getPrisma(req);
+        const updatedTeacher = await prisma.teacher.update({
+            where: { id: teacherId, schoolId },
+            data: { firstName, surname }
+        });
+
+        res.status(200).json(updatedTeacher);
+    } catch (error) {
+        console.error(error);
+
+        return errors.server();
+    }
+}
 
 export const deleteTeacher = async (req: Request, res: Response) => {
     const errors = new Errors(res, "Teacher");

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { createSchool, deleteSchool, listSchools, updateSchool } from "../controllers/school.controller";
 import { createClass, listClasses } from "../controllers/class.controller";
-import { createTeacher, deleteTeacher, listTeachers } from "../controllers/teacher.controller";
+import { createTeacher, deleteTeacher, listTeachers, updateTeacher } from "../controllers/teacher.controller";
 import { createSubject, getSubjects } from "../controllers/subject.controller";
 import { createStudent, getAllStudents } from "../controllers/student.controller";
 import { createMark } from "../controllers/mark.controller";
@@ -15,6 +15,7 @@ router.delete("/:schoolId", deleteSchool);
 
 router.get("/:schoolId/teachers", listTeachers)
 router.post("/:schoolId/teachers", createTeacher);
+router.put("/:schoolId/teachers/:teacherId", updateTeacher);
 router.delete("/:schoolId/teachers/:teacherId", deleteTeacher);
 
 router.get("/:schoolId/classes", listClasses);

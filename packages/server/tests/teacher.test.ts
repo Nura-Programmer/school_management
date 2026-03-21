@@ -121,8 +121,8 @@ describe("Teacher API", async () => {
             surname: updatedInfo.surname
         });
 
-        expect(updateFirstName.body.name, "to update teacher's first name").toBe(updatedInfo.firstName);
-        expect(updateSurname.body.address, "to update teacher's surname").toBe(updatedInfo.surname);
+        expect(updateFirstName.body.firstName, "to update teacher's first name").toBe(updatedInfo.firstName);
+        expect(updateSurname.body.surname, "to update teacher's surname").toBe(updatedInfo.surname);
     });
 
     it("should delete a teacher", async () => {

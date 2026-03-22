@@ -8,6 +8,13 @@ type CreateSubjectProps = {
     name?: string | number | null
 }
 
+type UpdateSubjectProps = {
+    schoolId: number,
+    classId: number,
+    subjectId: number,
+    name: string
+}
+
 type GetSubjectsProps = {
     schoolId?: number | null,
     classId?: number | null,
@@ -31,6 +38,22 @@ const subjectMocks = {
                     name,
                     classId
                 })
+        );
+    },
+
+    update: async ({ subjectId, classId, schoolId, name }: UpdateSubjectProps) => {
+        return await withTestPrisma(
+            request(app).put(
+                `${subjectsApi(schoolId, classId)}/${subjectId}`
+            ).send({ name })
+        );
+    },
+
+    delete: async (schoolId: number, classId: number, subjectId: number) => {
+        return await withTestPrisma(
+            request(app).delete(
+                `${subjectsApi(schoolId, classId)}/${subjectId}`
+            ).send()
         );
     },
 

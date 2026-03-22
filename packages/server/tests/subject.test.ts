@@ -117,4 +117,57 @@ describe("Subjects API", () => {
         expect(subjects.status).toBe(200);
         expect(subjects.body.length).toBe(2);
     });
+
+    it("should update a subject", async () => {
+        const updatedName = "updatedName";
+        const school = await schoolMocks.create(schoolInfo);
+        const { id: schoolId } = school.body;
+
+        const classResonse = await classMocks.create({
+            schoolId,
+            ...classMocks.info
+        });
+        const { id: classId } = classResonse.body;
+
+        const subjectResponse = await subjectMocks.create({
+            schoolId,
+            classId,
+            name: subjectMocks.info.name
+        });
+        const { id: subjectId } = subjectResponse.body;
+
+        const updatedSubject = await subjectMocks.update({
+            name: updatedName,
+            subjectId,
+            classId,
+            schoolId
+        });
+
+        expect(updatedSubject.status).toBe(200);
+        expect(updatedSubject.body.name).toBe(updatedName);
+    });
+
+    it("should delete a subject", async () => {
+        const school = await schoolMocks.create(schoolInfo);
+
+        const classResonse = await classMocks.create({
+            schoolId: school.body.id,
+            ...classMocks.info
+        });
+
+        const subjectResponse = await subjectMocks.create({
+            schoolId: school.body.id,
+            classId: classResonse.body.id,
+            name: subjectMocks.info.name
+        });
+
+        const deletedSubject = await subjectMocks.delete(
+            school.body.id,
+            classResonse.body.id,
+            subjectResponse.body.id
+        );
+
+        expect(deletedSubject.status).toBe(200);
+        expect(deletedSubject.body.id).toBe(subjectResponse.body.id);
+    })
 })

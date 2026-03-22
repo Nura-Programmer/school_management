@@ -4,7 +4,7 @@ import { createClass, deleteClass, listClasses, updateClass } from "../controlle
 import { createTeacher, deleteTeacher, listTeachers, updateTeacher } from "../controllers/teacher.controller";
 import { createSubject, deleteSubject, getSubjects, updateSubject } from "../controllers/subject.controller";
 import { createStudent, deleteStuent, getAllStudents, updateStudent } from "../controllers/student.controller";
-import { createMark } from "../controllers/mark.controller";
+import { createMark, updateMark } from "../controllers/mark.controller";
 
 const router = Router();
 
@@ -34,5 +34,6 @@ router.put("/:schoolId/classes/:classId/students/:studentId", updateStudent);
 router.delete("/:schoolId/classes/:classId/students/:studentId", deleteStuent);
 
 router.post("/:schoolId/classes/:classId/marks", createMark);
+router.put("/:schoolId/classes/:classId/marks", updateMark);
 
 export default router;

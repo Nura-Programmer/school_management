@@ -1,6 +1,6 @@
 import type { Request, Response } from "express"
 import { getPrisma } from "../prisma/getPrisma";
-import { createStudentSchema, getStudentsSchema } from "../schemas/student.schema";
+import { createStudentSchema, deleteStudentSchema, getStudentsSchema } from "../schemas/student.schema";
 import Errors from "../errors";
 
 export const createStudent = async (req: Request, res: Response) => {
@@ -25,6 +25,37 @@ export const createStudent = async (req: Request, res: Response) => {
         });
 
         res.status(201).json(newStudent);
+    } catch (error) {
+        console.error(error);
+
+        return errors.server();
+    }
+}
+
+export const deleteStuent = async (req: Request, res: Response) => {
+    const errors = new Errors(res, "Student");
+
+    try {
+        const validatePayload = deleteStudentSchema.safeParse({
+            studentId: Number(req.params.studentId)
+        });
+        if (!validatePayload.success) {
+            return errors.validation(validatePayload.error.message);
+        }
+
+        const prisma = getPrisma(req);
+        const { studentId } = validatePayload.data;
+
+        const studentExist = await prisma.student.findFirst({
+            where: { id: studentId }
+        });
+        if (!studentExist) return errors.notFound();
+
+        const deletedStudent = await prisma.student.delete({
+            where: { id: studentId }
+        });
+
+        res.status(200).json({ id: deletedStudent.id });
     } catch (error) {
         console.error(error);
 

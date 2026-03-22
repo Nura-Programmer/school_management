@@ -7,6 +7,10 @@ export const createStudentSchema = z.object({
     schoolId: z.number()
 });
 
+export const deleteStudentSchema = z.object({
+    studentId: z.number()
+});
+
 export const getStudentsSchema = z.object({
     schoolId: z.number(),
     page: z.number().optional(),

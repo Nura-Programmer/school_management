@@ -125,4 +125,66 @@ describe("Marks API", () => {
         expect(whenTestIsNaN.body.error, "returns validation error when test is NaN").toBe("ValidationError");
         expect(whenExamIsNaN.body.error, "returns validation error when exam is NaN").toBe("ValidationError");
     });
+
+    it("should update a mark", async () => {
+        const updatedInfo = { ca: 15, test: 19, exam: 48 };
+        const { info: schoolInfo } = schoolMocks;
+
+        const school = await schoolMocks.create(schoolInfo);
+        const { id: schoolId } = school.body;
+
+        const classResonse = await classMocks.create({
+            schoolId,
+            ...classMocks.info
+        });
+        const { id: classId } = classResonse.body;
+
+        const studentResponse = await studentMocks.create({
+            schoolId,
+            classId,
+            ...studentMocks.info
+        });
+        const { id: studentId } = studentResponse.body;
+
+        const subjectResponse = await subjectMocks.create({
+            schoolId,
+            classId,
+            name: subjectMocks.info.name
+        });
+        const { id: subjectId } = subjectResponse.body;
+
+        const markResponse = await markMocks.create({
+            schoolId,
+            classId,
+            studentId,
+            subjectId,
+            ...markMocks.info
+        });
+        const { id: markId } = markResponse.body;
+
+        const updateCA = await markMocks.update({
+            id: Number(markId),
+            schoolId: Number(schoolId),
+            classId: Number(classId),
+            ca: updatedInfo.ca
+        });
+
+        const updateTest = await markMocks.update({
+            id: Number(markId),
+            schoolId: Number(schoolId),
+            classId: Number(classId),
+            test: updatedInfo.test
+        });
+
+        const updateExam = await markMocks.update({
+            id: Number(markId),
+            schoolId: Number(schoolId),
+            classId: Number(classId),
+            exam: updatedInfo.exam
+        });
+
+        expect(updateCA.body.ca, "to update ca").toBe(updatedInfo.ca);
+        expect(updateTest.body.test, "to update test").toBe(updatedInfo.test);
+        expect(updateExam.body.exam, "to update exam").toBe(updatedInfo.exam);
+    });
 })

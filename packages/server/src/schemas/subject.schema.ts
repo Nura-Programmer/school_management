@@ -5,6 +5,11 @@ export const createSubjectSchema = z.object({
     classId: z.number()
 });
 
+export const updateSubjectSchema = z.object({
+    name: z.string().min(1, "Subject name is required.").max(100, "Subject nqame must not exceed 100 characters."),
+    subjectId: z.number()
+});
+
 export const deleteSubjectSchema = z.object({
     subjectId: z.number()
 });

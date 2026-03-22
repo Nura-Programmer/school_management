@@ -119,4 +119,55 @@ describe("Students API", () => {
         expect(student.status).toBe(200);
         expect(student.body.length).toBe(2);
     });
-})
+
+    it("should update a student", async () => {
+        const updatedName = "updatedName";
+
+        const school = await schoolMocks.create(schoolInfo);
+
+        const classResonse = await classMocks.create({
+            schoolId: school.body.id,
+            ...classMocks.info
+        });
+
+        const studentResponse = await studentMocks.create({
+            schoolId: school.body.id,
+            classId: classResonse.body.id,
+            ...studentMocks.info
+        });
+
+        const updatedStudent = await studentMocks.update({
+            studentId: studentResponse.body.id,
+            classId: classResonse.body.id,
+            schoolId: school.body.id,
+            name: updatedName
+        });
+
+        expect(updatedStudent.status).toBe(200);
+        expect(updatedStudent.body.name).toBe(updatedName);
+    });
+
+    it("should delete a student", async () => {
+        const school = await schoolMocks.create(schoolInfo);
+
+        const classResonse = await classMocks.create({
+            schoolId: school.body.id,
+            ...classMocks.info
+        });
+
+        const studentResponse = await studentMocks.create({
+            schoolId: school.body.id,
+            classId: classResonse.body.id,
+            ...studentMocks.info
+        });
+
+        const deletedStudent = await studentMocks.delete(
+            school.body.id,
+            classResonse.body.id,
+            studentResponse.body.id
+        );
+
+        expect(deletedStudent.status).toBe(200);
+        expect(deletedStudent.body.id).toBe(studentResponse.body.id);
+    });
+});

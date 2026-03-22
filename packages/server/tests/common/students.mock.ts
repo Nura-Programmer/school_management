@@ -9,6 +9,13 @@ type CreateStudentProps = {
     classId?: number
 }
 
+type UpdateStudentProps = {
+    schoolId: number,
+    classId: number,
+    studentId: number,
+    name: string
+}
+
 const studentsApi = (
     schoolId?: number | null,
     classId?: number | null
@@ -30,6 +37,22 @@ const studentMocks = {
                     classId,
                     schoolId
                 })
+        );
+    },
+
+    update: async ({ studentId, classId, schoolId, name }: UpdateStudentProps) => {
+        return await withTestPrisma(
+            request(app).put(
+                `${studentsApi(schoolId, classId)}/${studentId}`
+            ).send({ name })
+        );
+    },
+
+    delete: async (schoolId: number, classId: number, studentId: number) => {
+        return await withTestPrisma(
+            request(app).delete(
+                `${studentsApi(schoolId, classId)}/${studentId}`
+            ).send()
         );
     },
 

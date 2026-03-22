@@ -1,6 +1,6 @@
 import type { Request, Response } from "express"
 import { getPrisma } from "../prisma/getPrisma";
-import { createStudentSchema, deleteStudentSchema, getStudentsSchema } from "../schemas/student.schema";
+import { createStudentSchema, deleteStudentSchema, getStudentsSchema, updateStudentSchema } from "../schemas/student.schema";
 import Errors from "../errors";
 
 export const createStudent = async (req: Request, res: Response) => {
@@ -25,6 +25,39 @@ export const createStudent = async (req: Request, res: Response) => {
         });
 
         res.status(201).json(newStudent);
+    } catch (error) {
+        console.error(error);
+
+        return errors.server();
+    }
+}
+
+export const updateStudent = async (req: Request, res: Response) => {
+    const errors = new Errors(res, "Student");
+
+    try {
+        const validatePayload = updateStudentSchema.safeParse({
+            studentId: Number(req.params.studentId),
+            ...req.body
+        });
+        if (!validatePayload.success) {
+            return errors.validation(validatePayload.error.message);
+        }
+
+        const prisma = getPrisma(req);
+        const { studentId, name } = validatePayload.data;
+
+        const studentExist = await prisma.student.findFirst({
+            where: { id: studentId }
+        });
+        if (!studentExist) return errors.notFound();
+
+        const updatedStudent = await prisma.student.update({
+            where: { id: studentId },
+            data: { name }
+        });
+
+        res.status(200).json(updatedStudent);
     } catch (error) {
         console.error(error);
 

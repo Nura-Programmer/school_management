@@ -7,6 +7,11 @@ export const createStudentSchema = z.object({
     schoolId: z.number()
 });
 
+export const updateStudentSchema = z.object({
+    studentId: z.number(),
+    name: z.string().min(3, "Name must not be less than 3 characters").max(100, "Name must not exceed 100 characters.")
+});
+
 export const deleteStudentSchema = z.object({
     studentId: z.number()
 });

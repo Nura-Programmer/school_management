@@ -3,7 +3,7 @@ import { createSchool, deleteSchool, listSchools, updateSchool } from "../contro
 import { createClass, deleteClass, listClasses, updateClass } from "../controllers/class.controller";
 import { createTeacher, deleteTeacher, listTeachers, updateTeacher } from "../controllers/teacher.controller";
 import { createSubject, getSubjects } from "../controllers/subject.controller";
-import { createStudent, deleteStuent, getAllStudents } from "../controllers/student.controller";
+import { createStudent, deleteStuent, getAllStudents, updateStudent } from "../controllers/student.controller";
 import { createMark } from "../controllers/mark.controller";
 
 const router = Router();
@@ -28,6 +28,7 @@ router.post("/:schoolId/classes/:classId/subjects", createSubject);
 
 router.get("/:schoolId/classes/:classId/students", getAllStudents);
 router.post("/:schoolId/classes/:classId/students", createStudent);
+router.put("/:schoolId/classes/:classId/students/:studentId", updateStudent);
 router.delete("/:schoolId/classes/:classId/students/:studentId", deleteStuent);
 
 router.post("/:schoolId/classes/:classId/marks", createMark);

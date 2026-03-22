@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { getPrisma } from "../prisma/getPrisma";
-import { createSubjectSchema, getSubjectsSchema } from "../schemas/subject.schema";
+import { createSubjectSchema, deleteSubjectSchema, getSubjectsSchema } from "../schemas/subject.schema";
 import Errors from "../errors";
 
 export const createSubject = async (req: Request, res: Response) => {
@@ -28,6 +28,37 @@ export const createSubject = async (req: Request, res: Response) => {
         });
 
         res.status(201).json(newSubject);
+    } catch (error) {
+        console.error(error);
+
+        return errors.server();
+    }
+}
+
+export const deleteSubject = async (req: Request, res: Response) => {
+    const errors = new Errors(res, "Subject");
+
+    try {
+        const validatePayload = deleteSubjectSchema.safeParse({
+            subjectId: Number(req.params.subjectId)
+        });
+        if (!validatePayload.success) {
+            return errors.validation(validatePayload.error.message);
+        }
+
+        const prisma = getPrisma(req);
+        const { subjectId } = validatePayload.data;
+
+        const subjectExist = await prisma.subject.findFirst({
+            where: { id: subjectId }
+        });
+        if (!subjectExist) return errors.notFound();
+
+        const deletedSubject = await prisma.subject.delete({
+            where: { id: subjectId }
+        });
+
+        res.status(200).json({ id: deletedSubject.id });
     } catch (error) {
         console.error(error);
 

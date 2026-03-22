@@ -5,6 +5,10 @@ export const createSubjectSchema = z.object({
     classId: z.number()
 });
 
+export const deleteSubjectSchema = z.object({
+    subjectId: z.number()
+});
+
 export const getSubjectsSchema = z.object({
     classId: z.number(),
     page: z.number().optional(),

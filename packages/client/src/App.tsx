@@ -11,7 +11,7 @@ function App() {
       .catch((error) => setMessage("Error fetching API: " + error.message));
   }, []);
 
-  return <h1>{message}</h1>;
+  return <p className="font-bold p-4 text-center">{message}</p>;
 }
 
 export default App;

@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/schools', schoolRoutes);
 
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
     res.send('Hello, School Management System!');
 });
 

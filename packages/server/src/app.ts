@@ -21,6 +21,10 @@ if (process.env.ENV === 'test') {
     app.use('/api/__test__', testRoutes);
 }
 
+app.use((req, res, next) => {
+    res.status(404).send("Sorry can't find that!")
+});
+
 // Must be the last middleware
 app.use(errorHandler);
 

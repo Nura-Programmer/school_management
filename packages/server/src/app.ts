@@ -2,7 +2,7 @@ import express from 'express';
 import schoolRoutes from './routes/school.routes';
 import { errorHandler } from './middleware/error.middleware';
 
-import testRoutes from "../tests/__test__.routes";
+import testRoutes from '../tests/__test__.routes';
 
 const app = express();
 
@@ -14,22 +14,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/schools', schoolRoutes);
 
 app.get('/api', (req, res) => {
-    res.send('Hello, School Management System!');
+   res.send('Hello, School Management System!');
 });
 
 if (process.env.ENV === 'test') {
-    app.use('/api/__test__', testRoutes);
+   app.use('/api/__test__', testRoutes);
 }
 
 app.use((req, res, next) => {
-    res.status(404).send("Sorry can't find that!")
+   res.status(404).send("Sorry can't find that!");
 });
 
 // Must be the last middleware
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+   console.log(`Server is running on port ${PORT}`);
 });
 
 export default app;

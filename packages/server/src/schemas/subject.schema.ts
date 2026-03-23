@@ -1,21 +1,27 @@
-import z from "zod";
+import z from 'zod';
 
 export const createSubjectSchema = z.object({
-    name: z.string().min(1, "Subject name is required.").max(100, "Subject nqame must not exceed 100 characters."),
-    classId: z.number()
+   name: z
+      .string()
+      .min(1, 'Subject name is required.')
+      .max(100, 'Subject nqame must not exceed 100 characters.'),
+   classId: z.number(),
 });
 
 export const updateSubjectSchema = z.object({
-    name: z.string().min(1, "Subject name is required.").max(100, "Subject nqame must not exceed 100 characters."),
-    subjectId: z.number()
+   name: z
+      .string()
+      .min(1, 'Subject name is required.')
+      .max(100, 'Subject nqame must not exceed 100 characters.'),
+   subjectId: z.number(),
 });
 
 export const deleteSubjectSchema = z.object({
-    subjectId: z.number()
+   subjectId: z.number(),
 });
 
 export const getSubjectsSchema = z.object({
-    classId: z.number(),
-    page: z.number().optional(),
-    limit: z.number().optional()
+   classId: z.number(),
+   page: z.number().optional(),
+   limit: z.number().optional(),
 });

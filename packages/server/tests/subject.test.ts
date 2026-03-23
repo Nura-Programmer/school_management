@@ -1,173 +1,173 @@
-import { describe, expect, it } from "vitest";
-import schoolMocks from "./common/schools.mocks";
-import classMocks from "./common/classes.mocks";
-import subjectMocks from "./common/subjects.mocks";
+import { describe, expect, it } from 'vitest';
+import schoolMocks from './common/schools.mocks';
+import classMocks from './common/classes.mocks';
+import subjectMocks from './common/subjects.mocks';
 
-describe("Subjects API", () => {
-    const { info: schoolInfo } = schoolMocks;
-    it("create subject under a specific class in a school", async () => {
-        const school = await schoolMocks.create(schoolInfo);
+describe('Subjects API', () => {
+   const { info: schoolInfo } = schoolMocks;
+   it('create subject under a specific class in a school', async () => {
+      const school = await schoolMocks.create(schoolInfo);
 
-        const classResonse = await classMocks.create({
-            schoolId: school.body.id,
-            ...classMocks.info
-        });
+      const classResonse = await classMocks.create({
+         schoolId: school.body.id,
+         ...classMocks.info,
+      });
 
-        const subjectResponse = await subjectMocks.create({
-            schoolId: school.body.id,
-            classId: classResonse.body.id,
-            name: subjectMocks.info.name
-        });
-        expect(subjectResponse.status).toBe(201);
-        expect(subjectResponse.body).toHaveProperty("id");
-        expect(subjectResponse.body.name).toBe(subjectMocks.info.name);
-    });
+      const subjectResponse = await subjectMocks.create({
+         schoolId: school.body.id,
+         classId: classResonse.body.id,
+         name: subjectMocks.info.name,
+      });
+      expect(subjectResponse.status).toBe(201);
+      expect(subjectResponse.body).toHaveProperty('id');
+      expect(subjectResponse.body.name).toBe(subjectMocks.info.name);
+   });
 
-    it("returns 400 when payload is empty", async () => {
-        const school = await schoolMocks.create(schoolInfo);
+   it('returns 400 when payload is empty', async () => {
+      const school = await schoolMocks.create(schoolInfo);
 
-        const classResponse = await classMocks.create({
-            schoolId: school.body.id,
-            ...classMocks.info
-        });
+      const classResponse = await classMocks.create({
+         schoolId: school.body.id,
+         ...classMocks.info,
+      });
 
-        const subjectResponse = await subjectMocks.create({});
-        expect(subjectResponse.status).toBe(400);
-    });
+      const subjectResponse = await subjectMocks.create({});
+      expect(subjectResponse.status).toBe(400);
+   });
 
-    it("returns 400 when name is not a string", async () => {
-        const school = await schoolMocks.create(schoolInfo);
+   it('returns 400 when name is not a string', async () => {
+      const school = await schoolMocks.create(schoolInfo);
 
-        const classResponse = await classMocks.create({
-            schoolId: school.body.id,
-            ...classMocks.info
-        });
+      const classResponse = await classMocks.create({
+         schoolId: school.body.id,
+         ...classMocks.info,
+      });
 
-        const subjectResponse = await subjectMocks.create({
-            schoolId: school.body.id,
-            classId: classResponse.body.id,
-            name: 123
-        });
-        expect(subjectResponse.status).toBe(400);
-    });
+      const subjectResponse = await subjectMocks.create({
+         schoolId: school.body.id,
+         classId: classResponse.body.id,
+         name: 123,
+      });
+      expect(subjectResponse.status).toBe(400);
+   });
 
-    it("returns structured validation error when name is empty", async () => {
-        const school = await schoolMocks.create(schoolInfo);
+   it('returns structured validation error when name is empty', async () => {
+      const school = await schoolMocks.create(schoolInfo);
 
-        const classResponse = await classMocks.create({
-            schoolId: school.body.id,
-            ...classMocks.info
-        });
+      const classResponse = await classMocks.create({
+         schoolId: school.body.id,
+         ...classMocks.info,
+      });
 
-        const subjectResponse = await subjectMocks.create({
-            schoolId: school.body.id,
-            classId: classResponse.body.id,
-            name: ""
-        });
-        expect(subjectResponse.status).toBe(400);
-    });
+      const subjectResponse = await subjectMocks.create({
+         schoolId: school.body.id,
+         classId: classResponse.body.id,
+         name: '',
+      });
+      expect(subjectResponse.status).toBe(400);
+   });
 
-    it("returns 409 when subject already exist under a class", async () => {
-        const school = await schoolMocks.create(schoolInfo);
+   it('returns 409 when subject already exist under a class', async () => {
+      const school = await schoolMocks.create(schoolInfo);
 
-        const classResponse = await classMocks.create({
-            schoolId: school.body.id,
-            ...classMocks.info
-        });
+      const classResponse = await classMocks.create({
+         schoolId: school.body.id,
+         ...classMocks.info,
+      });
 
-        const firstSubject = await subjectMocks.create({
-            schoolId: school.body.id,
-            classId: classResponse.body.id,
-            ...subjectMocks.info
-        });
+      const firstSubject = await subjectMocks.create({
+         schoolId: school.body.id,
+         classId: classResponse.body.id,
+         ...subjectMocks.info,
+      });
 
-        const secondSubject = await subjectMocks.create({
-            schoolId: school.body.id,
-            classId: classResponse.body.id,
-            ...subjectMocks.info
-        });
-        expect(secondSubject.status).toBe(409);
-        expect(secondSubject.body.error).toBe("Conflict");
-    });
+      const secondSubject = await subjectMocks.create({
+         schoolId: school.body.id,
+         classId: classResponse.body.id,
+         ...subjectMocks.info,
+      });
+      expect(secondSubject.status).toBe(409);
+      expect(secondSubject.body.error).toBe('Conflict');
+   });
 
-    it("returns all subjects under a class", async () => {
-        const school = await schoolMocks.create(schoolInfo);
+   it('returns all subjects under a class', async () => {
+      const school = await schoolMocks.create(schoolInfo);
 
-        const classResponse = await classMocks.create({
-            schoolId: school.body.id,
-            ...classMocks.info
-        });
+      const classResponse = await classMocks.create({
+         schoolId: school.body.id,
+         ...classMocks.info,
+      });
 
-        const firstSubject = await subjectMocks.create({
-            schoolId: school.body.id,
-            classId: classResponse.body.id,
-            ...subjectMocks.info
-        });
+      const firstSubject = await subjectMocks.create({
+         schoolId: school.body.id,
+         classId: classResponse.body.id,
+         ...subjectMocks.info,
+      });
 
-        const secondSubject = await subjectMocks.create({
-            schoolId: school.body.id,
-            classId: classResponse.body.id,
-            name: "computer"
-        });
+      const secondSubject = await subjectMocks.create({
+         schoolId: school.body.id,
+         classId: classResponse.body.id,
+         name: 'computer',
+      });
 
-        const subjects = await subjectMocks.getSubjects({
-            schoolId: school.body.id,
-            classId: classResponse.body.id
-        });
-        expect(subjects.status).toBe(200);
-        expect(subjects.body.length).toBe(2);
-    });
+      const subjects = await subjectMocks.getSubjects({
+         schoolId: school.body.id,
+         classId: classResponse.body.id,
+      });
+      expect(subjects.status).toBe(200);
+      expect(subjects.body.length).toBe(2);
+   });
 
-    it("should update a subject", async () => {
-        const updatedName = "updatedName";
-        const school = await schoolMocks.create(schoolInfo);
-        const { id: schoolId } = school.body;
+   it('should update a subject', async () => {
+      const updatedName = 'updatedName';
+      const school = await schoolMocks.create(schoolInfo);
+      const { id: schoolId } = school.body;
 
-        const classResonse = await classMocks.create({
-            schoolId,
-            ...classMocks.info
-        });
-        const { id: classId } = classResonse.body;
+      const classResonse = await classMocks.create({
+         schoolId,
+         ...classMocks.info,
+      });
+      const { id: classId } = classResonse.body;
 
-        const subjectResponse = await subjectMocks.create({
-            schoolId,
-            classId,
-            name: subjectMocks.info.name
-        });
-        const { id: subjectId } = subjectResponse.body;
+      const subjectResponse = await subjectMocks.create({
+         schoolId,
+         classId,
+         name: subjectMocks.info.name,
+      });
+      const { id: subjectId } = subjectResponse.body;
 
-        const updatedSubject = await subjectMocks.update({
-            name: updatedName,
-            subjectId,
-            classId,
-            schoolId
-        });
+      const updatedSubject = await subjectMocks.update({
+         name: updatedName,
+         subjectId,
+         classId,
+         schoolId,
+      });
 
-        expect(updatedSubject.status).toBe(200);
-        expect(updatedSubject.body.name).toBe(updatedName);
-    });
+      expect(updatedSubject.status).toBe(200);
+      expect(updatedSubject.body.name).toBe(updatedName);
+   });
 
-    it("should delete a subject", async () => {
-        const school = await schoolMocks.create(schoolInfo);
+   it('should delete a subject', async () => {
+      const school = await schoolMocks.create(schoolInfo);
 
-        const classResonse = await classMocks.create({
-            schoolId: school.body.id,
-            ...classMocks.info
-        });
+      const classResonse = await classMocks.create({
+         schoolId: school.body.id,
+         ...classMocks.info,
+      });
 
-        const subjectResponse = await subjectMocks.create({
-            schoolId: school.body.id,
-            classId: classResonse.body.id,
-            name: subjectMocks.info.name
-        });
+      const subjectResponse = await subjectMocks.create({
+         schoolId: school.body.id,
+         classId: classResonse.body.id,
+         name: subjectMocks.info.name,
+      });
 
-        const deletedSubject = await subjectMocks.delete(
-            school.body.id,
-            classResonse.body.id,
-            subjectResponse.body.id
-        );
+      const deletedSubject = await subjectMocks.delete(
+         school.body.id,
+         classResonse.body.id,
+         subjectResponse.body.id
+      );
 
-        expect(deletedSubject.status).toBe(200);
-        expect(deletedSubject.body.id).toBe(subjectResponse.body.id);
-    })
-})
+      expect(deletedSubject.status).toBe(200);
+      expect(deletedSubject.body.id).toBe(subjectResponse.body.id);
+   });
+});

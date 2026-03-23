@@ -1,9 +1,9 @@
-import { Router } from "express";
+import { Router } from 'express';
 
 const router = Router();
 
-router.get("/crash", () => {
-    throw new Error("Forced crash for testing purposes");
-})
+router.get('/crash', () => {
+   throw new Error('Forced crash for testing purposes');
+});
 
 export default router;

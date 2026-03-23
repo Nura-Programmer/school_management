@@ -1,28 +1,28 @@
-import prisma from "../../src/prisma/client";
-import type { PrismaClient } from "@prisma/client";
+import prisma from '../../src/prisma/client';
+import type { PrismaClient } from '@prisma/client';
 
 let testPrisma: PrismaClient | null = null;
 
 export const beginTest = async () => {
-    if (!testPrisma) testPrisma = prisma;
+   if (!testPrisma) testPrisma = prisma;
 
-    return testPrisma;
-}
+   return testPrisma;
+};
 
 export const getTestPrisma = async (): Promise<PrismaClient | void> => {
-    if (!testPrisma) {
-        throw new Error("Test Prisma not initialized");
-    }
+   if (!testPrisma) {
+      throw new Error('Test Prisma not initialized');
+   }
 
-    return testPrisma;
-}
+   return testPrisma;
+};
 
 export const resetTest = async () => {
-    if (!testPrisma) return;
+   if (!testPrisma) return;
 
-    await prisma.school.deleteMany();
-    await prisma.teacher.deleteMany();
-    await prisma.classModel.deleteMany();
+   await prisma.school.deleteMany();
+   await prisma.teacher.deleteMany();
+   await prisma.classModel.deleteMany();
 
-    testPrisma = null;
-}
+   testPrisma = null;
+};

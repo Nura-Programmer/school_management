@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 import type { Request, Response, NextFunction } from 'express';
 
 export const errorHandler = (
@@ -7,6 +6,8 @@ export const errorHandler = (
    res: Response,
    _next: NextFunction
 ) => {
+   console.error(err);
+
    res.status(500).json({
       error: 'InternalServerError',
       message: 'An unexpected error occurred',

@@ -3,28 +3,38 @@ import z from 'zod';
 export const createTeacherSchema = z.object({
    firstName: z
       .string()
-      .min(3, 'First name must be atleat 3 characters.')
+      .min(3, 'First name must be atleast 3 characters.')
       .max(100, 'First name must not exceed 100 characters.'),
    surname: z
       .string()
       .min(3, 'Second name must be atleat 3 characters.')
       .max(100, 'Second name must not exceed 100 characters.'),
    schoolId: z.number('School ID must be a number.'),
+   username: z.string()
+      .min(3, "Username must be atleast 3 characters.")
+      .max(40, "Username must not exceed 40 characters."),
+   password: z.string()
+      .min(8, "Password must be atleast 8 characters.")
+      .max(50, "Password must not axceed 50 characters.") // 50 characters after hashing it, 255 characters
 });
 
 export const updateTeacherSchema = z.object({
    teacherId: z.number('Teacher ID must be a number.'),
    schoolId: z.number('School ID must be a number.'),
-   firstName: z
-      .string()
+   firstName: z.string()
       .min(3, 'First name must be atleat 3 characters.')
       .max(100, 'First name must not exceed 100 characters.')
       .optional(),
-   surname: z
-      .string()
+   surname: z.string()
       .min(3, 'Second name must be atleat 3 characters.')
       .max(100, 'Second name must not exceed 100 characters.')
       .optional(),
+   username: z.string()
+      .min(3, "Username must be atleast 3 characters.")
+      .max(40, "Username must not exceed 40 characters.").optional(),
+   password: z.string()
+      .min(8, "Password must be atleast 8 characters.")
+      .max(50, "Password must not axceed 50 characters.").optional()
 });
 
 export const getTeachersSchema = z.object({

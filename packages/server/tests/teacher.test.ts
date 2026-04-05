@@ -21,10 +21,11 @@ describe('Teacher API', async () => {
 
    it('returns 400 if firstName is missing', async () => {
       const school = await schoolMocks.create(schoolInfo);
+      const { firstName: _, ...teacherWithOutFirstName } = teacherMocks.info
 
       const response = await teacherMocks.create({
          schoolId: school.body.id,
-         surname: teacherMocks.info.surname,
+         ...teacherWithOutFirstName
       });
 
       expect(response.status).toBe(400);
@@ -32,10 +33,11 @@ describe('Teacher API', async () => {
 
    it('returns 400 if surname is missing', async () => {
       const school = await schoolMocks.create(schoolInfo);
+      const { surname: _, ...teacherWithOutSurname } = teacherMocks.info;
 
       const response = await teacherMocks.create({
          schoolId: school.body.id,
-         firstName: teacherMocks.info.firstName,
+         ...teacherWithOutSurname
       });
 
       expect(response.status).toBe(400);
@@ -87,6 +89,8 @@ describe('Teacher API', async () => {
          schoolId: school.body.id,
          firstName: 'TeacherName',
          surname: 'TeacherSurname',
+         username: "teacherusername",
+         password: teacherMocks.info.password
       });
 
       const teachers = await teacherMocks.getTeachers({
@@ -115,6 +119,7 @@ describe('Teacher API', async () => {
       const updatedInfo = {
          firstName: 'updatedFirstName',
          surname: 'updatedSurname',
+         password: "updatedSecretPassword"
       };
 
       const updateFirstName = await teacherMocks.update({
@@ -129,13 +134,19 @@ describe('Teacher API', async () => {
          surname: updatedInfo.surname,
       });
 
-      expect(
-         updateFirstName.body.firstName,
-         "to update teacher's first name"
-      ).toBe(updatedInfo.firstName);
-      expect(updateSurname.body.surname, "to update teacher's surname").toBe(
-         updatedInfo.surname
-      );
+      const updatePassword = await teacherMocks.update({
+         id: teacher.body.id,
+         schoolId: school.body.id,
+         password: updatedInfo.password,
+      });
+
+      expect(updateFirstName.body.firstName, "to update teacher's first name")
+         .toBe(updatedInfo.firstName);
+      expect(updateSurname.body.surname, "to update teacher's surname")
+         .toBe(updatedInfo.surname);
+      expect(updatePassword.body.password, "to update teacher's password")
+         .toBe(updatedInfo.password);
+
    });
 
    it('should delete a teacher', async () => {

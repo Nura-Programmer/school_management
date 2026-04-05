@@ -5,6 +5,8 @@ import { withTestPrisma } from '../helpers/withTestPrisma';
 type CreateTeacherProps = {
    firstName?: string | null;
    surname?: string | null;
+   username?: string | null;
+   password?: string | null;
    schoolId: number | null;
 };
 
@@ -23,19 +25,24 @@ const teacherMocks = {
    info: {
       firstName: 'Nura',
       surname: 'Pro',
+      username: "nurapro",
+      password: "secretPassword"
    },
 
-   create: async ({ schoolId, firstName, surname }: CreateTeacherProps) => {
+   create: async ({ schoolId, firstName, surname, username, password }: CreateTeacherProps) => {
       return await withTestPrisma(
-         request(app).post(teacherApi(schoolId)).send({ firstName, surname })
+         request(app).post(teacherApi(schoolId)).send({
+            firstName, surname, username, password
+         })
       );
    },
 
-   update: async ({ id, schoolId, firstName, surname }: UpdateTeacherProps) => {
-      let payload: UpdateTeacherProps = { id, schoolId };
+   update: async ({ id, schoolId, firstName, surname, password }: UpdateTeacherProps) => {
+      let payload: UpdateTeacherProps = { id, schoolId, password };
 
       if (firstName) payload.firstName = firstName;
       if (surname) payload.surname = surname;
+      if (password) payload.password = password;
 
       return await withTestPrisma(
          request(app)

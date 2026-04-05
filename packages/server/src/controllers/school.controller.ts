@@ -13,15 +13,15 @@ export const createSchool = async (req: Request, res: Response) => {
       }
 
       const prisma = getPrisma(req);
-      const { name, address } = validatePayload.data;
+      const { name, code, town, address } = validatePayload.data;
 
       const schoolExist = await prisma.school.findFirst({
-         where: { name, address },
+         where: { name, code, town, address },
       });
       if (schoolExist) return errors.conflict();
 
       const school = await prisma.school.create({
-         data: { name, address: address ?? '' },
+         data: { name, code, town, address: address ?? '' },
       });
 
       res.status(201).json(school);
@@ -36,7 +36,7 @@ export const updateSchool = async (req: Request, res: Response) => {
    const errors = new Errors(res, 'School');
 
    try {
-      const { name, address } = req.body;
+      const { name, code, town, address } = req.body;
       const schoolId = Number(req.params.schoolId);
 
       if (!schoolId) return errors.validation('School ID is required.');
@@ -52,7 +52,7 @@ export const updateSchool = async (req: Request, res: Response) => {
 
       const updatedSchool = await prisma.school.update({
          where: { id: schoolId },
-         data: { name, address },
+         data: { name, code, town, address },
       });
 
       res.status(200).json(updatedSchool);

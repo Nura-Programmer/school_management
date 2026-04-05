@@ -20,7 +20,7 @@ export const createTeacher = async (req: Request, res: Response) => {
       }
 
       const prisma = getPrisma(req);
-      const { firstName, surname, schoolId } = validatePayload.data;
+      const { firstName, surname, schoolId, username, password } = validatePayload.data;
 
       const school = await prisma.school.findUnique({
          where: { id: Number(schoolId) },
@@ -28,12 +28,12 @@ export const createTeacher = async (req: Request, res: Response) => {
       if (!school) return errors.notFound();
 
       const teacherExist = await prisma.teacher.findFirst({
-         where: { schoolId, firstName, surname },
+         where: { schoolId, username },
       });
       if (teacherExist) return errors.conflict();
 
       const newTeacher = await prisma.teacher.create({
-         data: { firstName, surname, schoolId },
+         data: { firstName, surname, schoolId, username, password },
       });
 
       res.status(201).json(newTeacher);
@@ -57,15 +57,15 @@ export const updateTeacher = async (req: Request, res: Response) => {
       if (!validation.success)
          return errors.validation(validation.error.message);
 
-      const { schoolId, teacherId, firstName, surname } = validation.data;
-      if (!firstName && !surname) {
-         return errors.validation('First name or surname is required.');
+      const { schoolId, teacherId, firstName, surname, username, password } = validation.data;
+      if (!firstName && !surname && !username && !password) {
+         return errors.validation('First name, surname, username or password is required.');
       }
 
       const prisma = getPrisma(req);
       const updatedTeacher = await prisma.teacher.update({
          where: { id: teacherId, schoolId },
-         data: { firstName, surname },
+         data: { firstName, surname, username, password },
       });
 
       res.status(200).json(updatedTeacher);

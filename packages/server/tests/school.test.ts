@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import schoolMocks from './common/schools.mocks';
 
 describe('School API', () => {
-   const { name, address } = schoolMocks.info;
+   const { name, code, town, address } = schoolMocks.info;
 
    it('should create a school', async () => {
-      const res = await schoolMocks.create({ name, address });
+      const res = await schoolMocks.create({ name, code, town, address });
 
       expect(res.status).toBe(201);
       expect(res.body).toHaveProperty('id');
@@ -38,19 +38,18 @@ describe('School API', () => {
    });
 
    it('returns 409 when school already exists', async () => {
-      const firstResponse = await schoolMocks.create({ name, address });
+      const firstResponse = await schoolMocks.create({ name, code, town, address });
 
-      const secondResponse = await schoolMocks.create({ name, address });
+      const secondResponse = await schoolMocks.create({ name, code, town, address });
       expect(secondResponse.status).toBe(409);
       expect(secondResponse.body.error).toBe('Conflict');
    });
 
    it('returns paginated schools', async () => {
-      const firstSchoolRes = await schoolMocks.create({ name, address });
+      const firstSchoolRes = await schoolMocks.create({ name, code, town, address });
 
       const secondSchoolRes = await schoolMocks.create({
-         name: 'Second School',
-         address,
+         name: 'Second School', code: "00654321", town, address,
       });
 
       const schools = await schoolMocks.getSchools({ page: 1, limit: 1 });
@@ -64,7 +63,7 @@ describe('School API', () => {
    });
 
    it('should updates a school', async () => {
-      const school = await schoolMocks.create({ name, address });
+      const school = await schoolMocks.create({ name, code, town, address });
       const { id } = school.body;
       const updatedInfo = { name: 'updatedName', address: 'updatedAddress' };
 
@@ -86,7 +85,7 @@ describe('School API', () => {
    });
 
    it('should delete a school', async () => {
-      const school = await schoolMocks.create({ name, address });
+      const school = await schoolMocks.create({ name, code, town, address });
       const { id } = school.body;
 
       const deleteSchool = await schoolMocks.delete(id);

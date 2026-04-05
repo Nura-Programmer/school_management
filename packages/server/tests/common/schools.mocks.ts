@@ -4,6 +4,8 @@ import app from '../../src/app';
 
 type CreateSchoolProps = {
    name?: string | number | null;
+   code?: string | number | null;
+   town?: string | null;
    address?: string | null;
 };
 
@@ -20,12 +22,14 @@ const schoolMocks = {
    info: {
       name: 'Annur International School',
       address: '123 Main St, Cityville',
+      code: '00123456',
+      town: "townName",
       id: null,
    },
 
-   create: async ({ name, address }: CreateSchoolProps) => {
+   create: async ({ name, code, town, address }: CreateSchoolProps) => {
       return await withTestPrisma(
-         request(app).post(schoolApi).send({ name, address })
+         request(app).post(schoolApi).send({ name, code, town, address })
       );
    },
 

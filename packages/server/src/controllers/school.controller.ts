@@ -1,124 +1,90 @@
-import type { Request, Response } from 'express';
 import { createSchoolSchema } from '../schemas/school.schema';
-import { getPrisma } from '../prisma/getPrisma';
-import Errors from '../errors';
+import Wrapper from '../middleware/wrapper';
 
-export const createSchool = async (req: Request, res: Response) => {
-   const errors = new Errors(res, 'School');
+const { withTryCatch } = new Wrapper("School");
 
-   try {
-      const validatePayload = createSchoolSchema.safeParse(req.body);
-      if (!validatePayload.success) {
-         return errors.validation(validatePayload.error.message);
-      }
+export const createSchool = withTryCatch(async (handlers, prisma, errors) => {
+   const { req, res, next } = handlers;
 
-      const prisma = getPrisma(req);
-      const { name, code, town, address } = validatePayload.data;
-
-      const schoolExist = await prisma.school.findFirst({
-         where: { name, code, town, address },
-      });
-      if (schoolExist) return errors.conflict();
-
-      const school = await prisma.school.create({
-         data: { name, code, town, address: address ?? '' },
-      });
-
-      res.status(201).json(school);
-   } catch (error) {
-      console.error(error);
-
-      return errors.server();
+   const validatePayload = createSchoolSchema.safeParse(req.body);
+   if (!validatePayload.success) {
+      return errors.validation(validatePayload.error.message);
    }
-};
 
-export const updateSchool = async (req: Request, res: Response) => {
-   const errors = new Errors(res, 'School');
+   const { name, code, town, address } = validatePayload.data;
+   const schoolExist = await prisma.school.findFirst({
+      where: { name, code, town, address },
+   });
+   if (schoolExist) return errors.conflict();
 
-   try {
-      const { name, code, town, address } = req.body;
-      const schoolId = Number(req.params.schoolId);
+   const school = await prisma.school.create({
+      data: { name, code, town, address: address ?? '' },
+   });
 
-      if (!schoolId) return errors.validation('School ID is required.');
-      if (!name && !address)
-         return errors.validation('Name or Address is required.');
+   res.status(201).json(school);
+})
 
-      const prisma = getPrisma(req);
-      const schoolExist = await prisma.school.findFirst({
-         where: { id: schoolId },
-      });
+export const updateSchool = withTryCatch(async (handlers, prisma, errors) => {
+   const { req, res, next } = handlers;
+   const { name, code, town, address } = req.body;
+   const schoolId = Number(req.params.schoolId);
 
-      if (!schoolExist) return errors.notFound();
+   if (!schoolId) return errors.validation('School ID is required.');
+   if (!name && !address)
+      return errors.validation('Name or Address is required.');
 
-      const updatedSchool = await prisma.school.update({
-         where: { id: schoolId },
-         data: { name, code, town, address },
-      });
+   const schoolExist = await prisma.school.findFirst({
+      where: { id: schoolId },
+   });
 
-      res.status(200).json(updatedSchool);
-   } catch (error) {
-      console.error(error);
+   if (!schoolExist) return errors.notFound();
 
-      return errors.server();
-   }
-};
+   const updatedSchool = await prisma.school.update({
+      where: { id: schoolId },
+      data: { name, code, town, address },
+   });
 
-export const deleteSchool = async (req: Request, res: Response) => {
-   const errors = new Errors(res, 'School');
+   res.status(200).json(updatedSchool);
+});
 
-   try {
-      const schoolId = Number(req.params.schoolId);
-      if (!schoolId) return errors.validation('School ID is required.');
+export const deleteSchool = withTryCatch(async (handlers, prisma, errors) => {
+   const { req, res, next } = handlers;
+   const schoolId = Number(req.params.schoolId);
+   if (!schoolId) return errors.validation('School ID is required.');
 
-      const prisma = getPrisma(req);
-      const schoolExist = await prisma.school.findFirst({
-         where: { id: schoolId },
-      });
+   const schoolExist = await prisma.school.findFirst({
+      where: { id: schoolId },
+   });
 
-      if (!schoolExist) return errors.notFound();
+   if (!schoolExist) return errors.notFound();
 
-      const deletedSchool = await prisma.school.delete({
-         where: { id: schoolId },
-      });
+   const deletedSchool = await prisma.school.delete({
+      where: { id: schoolId },
+   });
 
-      res.status(200).json({ id: deletedSchool.id });
-   } catch (error) {
-      console.error(error);
+   res.status(200).json({ id: deletedSchool.id });
 
-      return errors.server();
-   }
-};
+});
 
-export const listSchools = async (req: Request, res: Response) => {
-   const errors = new Errors(res, 'School');
+export const listSchools = withTryCatch(async (handlers, prisma, errors) => {
+   const { req, res, next } = handlers;
 
-   try {
-      const page = Math.max(1, parseInt(req.query.page as string) || 1);
-      const limit = Math.max(1, parseInt(req.query.limit as string) || 10);
-      const skip = (page - 1) * limit;
+   const page = Math.max(1, parseInt(req.query.page as string) || 1);
+   const limit = Math.max(1, parseInt(req.query.limit as string) || 10);
+   const skip = (page - 1) * limit;
 
-      const prisma = getPrisma(req);
-      const schools = await prisma.school.findMany({
-         skip,
-         take: limit + 1,
-         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-      });
+   const schools = await prisma.school.findMany({
+      skip,
+      take: limit + 1,
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+   });
 
-      const hasNext = schools.length > limit;
+   const hasNext = schools.length > limit;
 
-      if (hasNext) schools.pop();
+   if (hasNext) schools.pop();
 
-      res.json({
-         data: schools,
-         meta: {
-            page,
-            limit,
-            hasNext,
-         },
-      });
-   } catch (error) {
-      console.error(error);
-
-      return errors.server();
-   }
-};
+   res.json({
+      data: schools,
+      meta: { page, limit, hasNext }
+   });
+});

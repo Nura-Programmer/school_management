@@ -1,4 +1,3 @@
-import type { Request, Response } from 'express';
 import { getPrisma } from '../prisma/getPrisma';
 import {
    createStudentSchema,
@@ -6,123 +5,97 @@ import {
    getStudentsSchema,
    updateStudentSchema,
 } from '../schemas/student.schema';
-import Errors from '../errors';
+import Wrapper from '../middleware/wrapper';
 
-export const createStudent = async (req: Request, res: Response) => {
-   const errors = new Errors(res, 'Student');
+const { withTryCatch } = new Wrapper("Student");
 
-   try {
-      const validatePayload = createStudentSchema.safeParse(req.body);
-      if (!validatePayload.success) {
-         return errors.validation(validatePayload.error.message);
-      }
+export const createStudent = withTryCatch(async (handlers, prisma, errors) => {
+   const { req, res, next } = handlers;
 
-      const prisma = getPrisma(req);
-      const { name, classType, classId, schoolId } = validatePayload.data;
-
-      const studentExist = await prisma.student.findFirst({
-         where: { schoolId, classId, classType, name },
-      });
-      if (studentExist) return errors.conflict();
-
-      const newStudent = await prisma.student.create({
-         data: { classId, classType, schoolId, name },
-      });
-
-      res.status(201).json(newStudent);
-   } catch (error) {
-      console.error(error);
-
-      return errors.server();
+   const validatePayload = createStudentSchema.safeParse(req.body);
+   if (!validatePayload.success) {
+      return errors.validation(validatePayload.error.message);
    }
-};
 
-export const updateStudent = async (req: Request, res: Response) => {
-   const errors = new Errors(res, 'Student');
+   const { name, classType, classId, schoolId } = validatePayload.data;
 
-   try {
-      const validatePayload = updateStudentSchema.safeParse({
-         studentId: Number(req.params.studentId),
-         ...req.body,
-      });
-      if (!validatePayload.success) {
-         return errors.validation(validatePayload.error.message);
-      }
+   const studentExist = await prisma.student.findFirst({
+      where: { schoolId, classId, classType, name },
+   });
+   if (studentExist) return errors.conflict();
 
-      const prisma = getPrisma(req);
-      const { studentId, name } = validatePayload.data;
+   const newStudent = await prisma.student.create({
+      data: { classId, classType, schoolId, name },
+   });
 
-      const studentExist = await prisma.student.findFirst({
-         where: { id: studentId },
-      });
-      if (!studentExist) return errors.notFound();
+   res.status(201).json(newStudent);
+});
 
-      const updatedStudent = await prisma.student.update({
-         where: { id: studentId },
-         data: { name },
-      });
+export const updateStudent = withTryCatch(async (handlers, prisma, errors) => {
+   const { req, res, next } = handlers;
 
-      res.status(200).json(updatedStudent);
-   } catch (error) {
-      console.error(error);
-
-      return errors.server();
+   const validatePayload = updateStudentSchema.safeParse({
+      studentId: Number(req.params.studentId),
+      ...req.body,
+   });
+   if (!validatePayload.success) {
+      return errors.validation(validatePayload.error.message);
    }
-};
 
-export const deleteStuent = async (req: Request, res: Response) => {
-   const errors = new Errors(res, 'Student');
+   const { studentId, name } = validatePayload.data;
 
-   try {
-      const validatePayload = deleteStudentSchema.safeParse({
-         studentId: Number(req.params.studentId),
-      });
-      if (!validatePayload.success) {
-         return errors.validation(validatePayload.error.message);
-      }
+   const studentExist = await prisma.student.findFirst({
+      where: { id: studentId },
+   });
+   if (!studentExist) return errors.notFound();
 
-      const prisma = getPrisma(req);
-      const { studentId } = validatePayload.data;
+   const updatedStudent = await prisma.student.update({
+      where: { id: studentId },
+      data: { name },
+   });
 
-      const studentExist = await prisma.student.findFirst({
-         where: { id: studentId },
-      });
-      if (!studentExist) return errors.notFound();
+   res.status(200).json(updatedStudent);
+});
 
-      const deletedStudent = await prisma.student.delete({
-         where: { id: studentId },
-      });
+export const deleteStuent = withTryCatch(async (handlers, prisma, errors) => {
+   const { req, res, next } = handlers;
 
-      res.status(200).json({ id: deletedStudent.id });
-   } catch (error) {
-      console.error(error);
-
-      return errors.server();
+   const validatePayload = deleteStudentSchema.safeParse({
+      studentId: Number(req.params.studentId),
+   });
+   if (!validatePayload.success) {
+      return errors.validation(validatePayload.error.message);
    }
-};
 
-export const getAllStudents = async (req: Request, res: Response) => {
-   const errors = new Errors(res, 'Student');
+   const { studentId } = validatePayload.data;
 
-   try {
-      const validatePayload = getStudentsSchema.safeParse({
-         schoolId: Number(req.params.schoolId),
-      });
-      if (!validatePayload.success) {
-         return errors.validation(validatePayload.error.message);
-      }
+   const studentExist = await prisma.student.findFirst({
+      where: { id: studentId },
+   });
+   if (!studentExist) return errors.notFound();
 
-      const prisma = getPrisma(req);
-      const { schoolId } = validatePayload.data;
+   const deletedStudent = await prisma.student.delete({
+      where: { id: studentId },
+   });
 
-      const students = await prisma.student.findMany({
-         where: { schoolId },
-      });
+   res.status(200).json({ id: deletedStudent.id });
+});
 
-      res.status(200).json(students);
-   } catch (error) {
-      console.error(error);
+export const getAllStudents = withTryCatch(async (handlers, prisma, errors) => {
+   const { req, res, next } = handlers;
 
-      return errors.server();
+   const validatePayload = getStudentsSchema.safeParse({
+      schoolId: Number(req.params.schoolId),
+   });
+   if (!validatePayload.success) {
+      return errors.validation(validatePayload.error.message);
    }
-};
+
+   const { schoolId } = validatePayload.data;
+
+   const students = await prisma.student.findMany({
+      where: { schoolId },
+   });
+
+   res.status(200).json(students);
+});

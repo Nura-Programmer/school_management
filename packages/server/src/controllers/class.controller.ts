@@ -1,7 +1,4 @@
-import type { NextFunction, Request, Response } from 'express';
 import { createClassSchema, getClassSchema } from '../schemas/class.schema';
-import { getPrisma } from '../prisma/getPrisma';
-import Errors from '../errors';
 import Wrapper from '../middleware/wrapper';
 
 const { withTryCatch } = new Wrapper("School");

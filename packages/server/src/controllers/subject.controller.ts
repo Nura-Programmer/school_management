@@ -1,131 +1,103 @@
-import type { Request, Response } from 'express';
-import { getPrisma } from '../prisma/getPrisma';
 import {
    createSubjectSchema,
    deleteSubjectSchema,
    getSubjectsSchema,
    updateSubjectSchema,
 } from '../schemas/subject.schema';
-import Errors from '../errors';
+import Wrapper from '../middleware/wrapper';
 
-export const createSubject = async (req: Request, res: Response) => {
-   const errors = new Errors(res, 'Subject');
+const { withTryCatch } = new Wrapper("Subject");
 
-   try {
-      const validatePayload = createSubjectSchema.safeParse({
-         schoolId: Number(req.params.schoolId),
-         ...req.body,
-      });
-      if (!validatePayload.success) {
-         return errors.validation(validatePayload.error.message);
-      }
+export const createSubject = withTryCatch(async (handlers, prisma, errors) => {
+   const { req, res, next } = handlers;
 
-      const prisma = getPrisma(req);
-      const { classId, name } = validatePayload.data;
-
-      const subjectExist = await prisma.subject.findFirst({
-         where: { classId, name },
-      });
-      if (subjectExist) return errors.conflict();
-
-      const newSubject = await prisma.subject.create({
-         data: { classId, name },
-      });
-
-      res.status(201).json(newSubject);
-   } catch (error) {
-      console.error(error);
-
-      return errors.server();
+   const validatePayload = createSubjectSchema.safeParse({
+      schoolId: Number(req.params.schoolId),
+      ...req.body,
+   });
+   if (!validatePayload.success) {
+      return errors.validation(validatePayload.error.message);
    }
-};
 
-export const updateSubject = async (req: Request, res: Response) => {
-   const errors = new Errors(res, 'Subject');
+   const { classId, name } = validatePayload.data;
 
-   try {
-      const validatePayload = updateSubjectSchema.safeParse({
-         subjectId: Number(req.params.subjectId),
-         ...req.body,
-      });
-      if (!validatePayload.success) {
-         return errors.validation(validatePayload.error.message);
-      }
+   const subjectExist = await prisma.subject.findFirst({
+      where: { classId, name },
+   });
+   if (subjectExist) return errors.conflict();
 
-      const prisma = getPrisma(req);
-      const { subjectId, name } = validatePayload.data;
+   const newSubject = await prisma.subject.create({
+      data: { classId, name },
+   });
 
-      const subjectExist = await prisma.subject.findFirst({
-         where: { id: subjectId },
-      });
-      if (!subjectExist) return errors.notFound();
+   res.status(201).json(newSubject);
+});
 
-      const updatedSubject = await prisma.subject.update({
-         where: { id: subjectId },
-         data: { name },
-      });
+export const updateSubject = withTryCatch(async (handlers, prisma, errors) => {
+   const { req, res, next } = handlers;
 
-      res.status(200).json(updatedSubject);
-   } catch (error) {
-      console.error(error);
-
-      return errors.server();
+   const validatePayload = updateSubjectSchema.safeParse({
+      subjectId: Number(req.params.subjectId),
+      ...req.body,
+   });
+   if (!validatePayload.success) {
+      return errors.validation(validatePayload.error.message);
    }
-};
 
-export const deleteSubject = async (req: Request, res: Response) => {
-   const errors = new Errors(res, 'Subject');
+   const { subjectId, name } = validatePayload.data;
 
-   try {
-      const validatePayload = deleteSubjectSchema.safeParse({
-         subjectId: Number(req.params.subjectId),
-      });
-      if (!validatePayload.success) {
-         return errors.validation(validatePayload.error.message);
-      }
+   const subjectExist = await prisma.subject.findFirst({
+      where: { id: subjectId },
+   });
+   if (!subjectExist) return errors.notFound();
 
-      const prisma = getPrisma(req);
-      const { subjectId } = validatePayload.data;
+   const updatedSubject = await prisma.subject.update({
+      where: { id: subjectId },
+      data: { name },
+   });
 
-      const subjectExist = await prisma.subject.findFirst({
-         where: { id: subjectId },
-      });
-      if (!subjectExist) return errors.notFound();
+   res.status(200).json(updatedSubject);
+});
 
-      const deletedSubject = await prisma.subject.delete({
-         where: { id: subjectId },
-      });
+export const deleteSubject = withTryCatch(async (handlers, prisma, errors) => {
+   const { req, res, next } = handlers;
 
-      res.status(200).json({ id: deletedSubject.id });
-   } catch (error) {
-      console.error(error);
-
-      return errors.server();
+   const validatePayload = deleteSubjectSchema.safeParse({
+      subjectId: Number(req.params.subjectId),
+   });
+   if (!validatePayload.success) {
+      return errors.validation(validatePayload.error.message);
    }
-};
 
-export const getSubjects = async (req: Request, res: Response) => {
-   const errors = new Errors(res, 'Subject');
+   const { subjectId } = validatePayload.data;
 
-   try {
-      const validatePayload = getSubjectsSchema.safeParse({
-         classId: Number(req.params.classId),
-      });
-      if (!validatePayload.success) {
-         return errors.validation(validatePayload.error.message);
-      }
+   const subjectExist = await prisma.subject.findFirst({
+      where: { id: subjectId },
+   });
+   if (!subjectExist) return errors.notFound();
 
-      const { classId } = validatePayload.data;
-      const prisma = getPrisma(req);
+   const deletedSubject = await prisma.subject.delete({
+      where: { id: subjectId },
+   });
 
-      const subjects = await prisma.subject.findMany({
-         where: { classId: Number(classId) },
-      });
+   res.status(200).json({ id: deletedSubject.id });
+});
 
-      res.status(200).json(subjects);
-   } catch (error) {
-      console.error(error);
+export const getSubjects = withTryCatch(async (handlers, prisma, errors) => {
+   const { req, res, next } = handlers;
 
-      return errors.server();
+   const validatePayload = getSubjectsSchema.safeParse({
+      classId: Number(req.params.classId),
+   });
+   if (!validatePayload.success) {
+      return errors.validation(validatePayload.error.message);
    }
-};
+
+   const { classId } = validatePayload.data;
+
+   const subjects = await prisma.subject.findMany({
+      where: { classId: Number(classId) },
+   });
+
+   res.status(200).json(subjects);
+});

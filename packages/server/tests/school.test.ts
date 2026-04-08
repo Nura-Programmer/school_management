@@ -12,6 +12,15 @@ describe('School API', () => {
       expect(res.body.name).toBe(schoolInfo.name);
    });
 
+   it('should create a school and a teacher', async () => {
+      const res = await schoolMocks.create(schoolInfo);
+
+      expect(res.status).toBe(201);
+      expect(res.body).toHaveProperty('id');
+      expect(res.body.name).toBe(schoolInfo.name);
+      expect(res.body.username, "to register school with a teacher").toBe(schoolInfo.username);
+   });
+
    it('returns 400 when payload is empty', async () => {
       const res = await schoolMocks.create({});
 
@@ -49,7 +58,10 @@ describe('School API', () => {
       const firstSchoolRes = await schoolMocks.create(schoolInfo);
 
       const secondSchoolRes = await schoolMocks.create({
-         ...schoolInfo, name: 'Second School', code: "00654321"
+         ...schoolInfo,
+         name: 'Second School',
+         code: "00654321",
+         username: "nura2"
       });
 
       const schools = await schoolMocks.getSchools({ page: 1, limit: 1 });

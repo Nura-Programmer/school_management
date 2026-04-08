@@ -1,5 +1,6 @@
 import { createSchoolSchema } from '../schemas/school.schema';
 import Wrapper from '../middleware/wrapper';
+import { hashPassword } from '../utils/hash';
 
 const { withTryCatch } = new Wrapper("School");
 
@@ -11,7 +12,9 @@ export const createSchool = withTryCatch(async (handlers, prisma, errors) => {
       return errors.validation(validatePayload.error.message);
    }
 
-   const { name, code, town, address } = validatePayload.data;
+   const {
+      name, code, town, address, firstName, surname, username, password
+   } = validatePayload.data;
    const schoolExist = await prisma.school.findFirst({
       where: { name, code, town, address },
    });
@@ -21,7 +24,19 @@ export const createSchool = withTryCatch(async (handlers, prisma, errors) => {
       data: { name, code, town, address: address ?? '' },
    });
 
-   res.status(201).json(school);
+   const hashedPassword = await hashPassword(password);
+
+   const teacher = await prisma.teacher.create({
+      data: {
+         schoolId: school.id,
+         firstName,
+         surname,
+         username,
+         password: hashedPassword
+      }
+   });
+
+   res.status(201).json({ ...teacher, ...school });
 })
 
 export const updateSchool = withTryCatch(async (handlers, prisma, errors) => {

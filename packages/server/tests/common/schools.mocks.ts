@@ -1,12 +1,18 @@
 import request from 'supertest';
 import { withTestPrisma } from '../helpers/withTestPrisma';
 import app from '../../src/app';
+import teacherMocks from './teachers.mocks';
 
 type CreateSchoolProps = {
    name?: string | number | null;
    code?: string | number | null;
    town?: string | null;
    address?: string | null;
+
+   firstName?: string | null;
+   surname?: string | null;
+   username?: string | null;
+   password?: string | null;
 };
 
 type UpdateSchoolProps = { id: number } & CreateSchoolProps;
@@ -25,19 +31,18 @@ const schoolMocks = {
       code: '00123456',
       town: "townName",
       id: null,
+      ...teacherMocks.info
    },
 
-   create: async ({ name, code, town, address }: CreateSchoolProps) => {
+   create: async (schoolPayload: CreateSchoolProps) => {
       return await withTestPrisma(
-         request(app).post(schoolApi).send({ name, code, town, address })
+         request(app).post(schoolApi).send(schoolPayload)
       );
    },
 
-   update: async ({ name, address, id }: UpdateSchoolProps) => {
-      let payload: CreateSchoolProps = {};
-
-      if (name) payload.name = name;
-      if (address) payload.address = address;
+   update: async (updatePayload: UpdateSchoolProps) => {
+      const { id } = updatePayload;
+      let payload: CreateSchoolProps = { ...updatePayload };
 
       return await withTestPrisma(
          request(app).put(`${schoolApi}/${id}`).send(payload)

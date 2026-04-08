@@ -2,14 +2,14 @@ import { describe, it, expect } from 'vitest';
 import schoolMocks from './common/schools.mocks';
 
 describe('School API', () => {
-   const { name, code, town, address } = schoolMocks.info;
+   const schoolInfo = schoolMocks.info;
 
    it('should create a school', async () => {
-      const res = await schoolMocks.create({ name, code, town, address });
+      const res = await schoolMocks.create(schoolInfo);
 
       expect(res.status).toBe(201);
       expect(res.body).toHaveProperty('id');
-      expect(res.body.name).toBe(name);
+      expect(res.body.name).toBe(schoolInfo.name);
    });
 
    it('returns 400 when payload is empty', async () => {
@@ -38,18 +38,18 @@ describe('School API', () => {
    });
 
    it('returns 409 when school already exists', async () => {
-      const firstResponse = await schoolMocks.create({ name, code, town, address });
+      const firstResponse = await schoolMocks.create(schoolInfo);
 
-      const secondResponse = await schoolMocks.create({ name, code, town, address });
+      const secondResponse = await schoolMocks.create(schoolInfo);
       expect(secondResponse.status).toBe(409);
       expect(secondResponse.body.error).toBe('Conflict');
    });
 
    it('returns paginated schools', async () => {
-      const firstSchoolRes = await schoolMocks.create({ name, code, town, address });
+      const firstSchoolRes = await schoolMocks.create(schoolInfo);
 
       const secondSchoolRes = await schoolMocks.create({
-         name: 'Second School', code: "00654321", town, address,
+         ...schoolInfo, name: 'Second School', code: "00654321"
       });
 
       const schools = await schoolMocks.getSchools({ page: 1, limit: 1 });
@@ -63,7 +63,7 @@ describe('School API', () => {
    });
 
    it('should updates a school', async () => {
-      const school = await schoolMocks.create({ name, code, town, address });
+      const school = await schoolMocks.create(schoolInfo);
       const { id } = school.body;
       const updatedInfo = { name: 'updatedName', address: 'updatedAddress' };
 
@@ -85,7 +85,7 @@ describe('School API', () => {
    });
 
    it('should delete a school', async () => {
-      const school = await schoolMocks.create({ name, code, town, address });
+      const school = await schoolMocks.create(schoolInfo);
       const { id } = school.body;
 
       const deleteSchool = await schoolMocks.delete(id);

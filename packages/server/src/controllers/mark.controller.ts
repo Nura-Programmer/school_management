@@ -4,7 +4,7 @@ import Wrapper from '../middleware/wrapper';
 const { withTryCatch } = new Wrapper("Marks");
 
 export const createMark = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = CreateMarkSchema.safeParse(req.body);
    if (!validatePayload.success) {
@@ -32,7 +32,7 @@ export const createMark = withTryCatch(async (handlers, prisma, errors) => {
 });
 
 export const updateMark = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = UpdateMarkSchema.safeParse(req.body);
    if (!validatePayload.success) {

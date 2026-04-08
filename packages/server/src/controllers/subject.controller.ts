@@ -9,7 +9,7 @@ import Wrapper from '../middleware/wrapper';
 const { withTryCatch } = new Wrapper("Subject");
 
 export const createSubject = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = createSubjectSchema.safeParse({
       schoolId: Number(req.params.schoolId),
@@ -34,7 +34,7 @@ export const createSubject = withTryCatch(async (handlers, prisma, errors) => {
 });
 
 export const updateSubject = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = updateSubjectSchema.safeParse({
       subjectId: Number(req.params.subjectId),
@@ -60,7 +60,7 @@ export const updateSubject = withTryCatch(async (handlers, prisma, errors) => {
 });
 
 export const deleteSubject = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = deleteSubjectSchema.safeParse({
       subjectId: Number(req.params.subjectId),
@@ -84,7 +84,7 @@ export const deleteSubject = withTryCatch(async (handlers, prisma, errors) => {
 });
 
 export const getSubjects = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = getSubjectsSchema.safeParse({
       classId: Number(req.params.classId),

@@ -4,7 +4,7 @@ import Wrapper from '../middleware/wrapper';
 const { withTryCatch } = new Wrapper("School");
 
 export const createClass = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = createClassSchema.safeParse({
       ...req.body,
@@ -31,7 +31,7 @@ export const createClass = withTryCatch(async (handlers, prisma, errors) => {
 });
 
 export const updateClass = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const { classId, schoolId } = req.params;
    const { name } = req.body;
@@ -55,7 +55,7 @@ export const updateClass = withTryCatch(async (handlers, prisma, errors) => {
 });
 
 export const deleteClass = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const { classId, schoolId } = req.params;
    if (!classId || !schoolId) {
@@ -75,7 +75,7 @@ export const deleteClass = withTryCatch(async (handlers, prisma, errors) => {
 });
 
 export const listClasses = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = getClassSchema.safeParse({
       schoolId: Number(req.params.schoolId),

@@ -10,7 +10,7 @@ import Wrapper from '../middleware/wrapper';
 const { withTryCatch } = new Wrapper("Student");
 
 export const createStudent = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = createStudentSchema.safeParse(req.body);
    if (!validatePayload.success) {
@@ -32,7 +32,7 @@ export const createStudent = withTryCatch(async (handlers, prisma, errors) => {
 });
 
 export const updateStudent = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = updateStudentSchema.safeParse({
       studentId: Number(req.params.studentId),
@@ -58,7 +58,7 @@ export const updateStudent = withTryCatch(async (handlers, prisma, errors) => {
 });
 
 export const deleteStuent = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = deleteStudentSchema.safeParse({
       studentId: Number(req.params.studentId),
@@ -82,7 +82,7 @@ export const deleteStuent = withTryCatch(async (handlers, prisma, errors) => {
 });
 
 export const getAllStudents = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = getStudentsSchema.safeParse({
       schoolId: Number(req.params.schoolId),

@@ -4,7 +4,7 @@ import Wrapper from '../middleware/wrapper';
 const { withTryCatch } = new Wrapper("School");
 
 export const createSchool = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = createSchoolSchema.safeParse(req.body);
    if (!validatePayload.success) {
@@ -25,7 +25,7 @@ export const createSchool = withTryCatch(async (handlers, prisma, errors) => {
 })
 
 export const updateSchool = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
    const { name, code, town, address } = req.body;
    const schoolId = Number(req.params.schoolId);
 
@@ -48,7 +48,7 @@ export const updateSchool = withTryCatch(async (handlers, prisma, errors) => {
 });
 
 export const deleteSchool = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
    const schoolId = Number(req.params.schoolId);
    if (!schoolId) return errors.validation('School ID is required.');
 
@@ -66,8 +66,8 @@ export const deleteSchool = withTryCatch(async (handlers, prisma, errors) => {
 
 });
 
-export const listSchools = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+export const listSchools = withTryCatch(async (handlers, prisma) => {
+   const { req, res } = handlers;
 
    const page = Math.max(1, parseInt(req.query.page as string) || 1);
    const limit = Math.max(1, parseInt(req.query.limit as string) || 10);

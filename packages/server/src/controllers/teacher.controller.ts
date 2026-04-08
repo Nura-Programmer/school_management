@@ -4,11 +4,12 @@ import {
    updateTeacherSchema,
 } from '../schemas/teacher.schema';
 import Wrapper from '../middleware/wrapper';
+import { hashPassword } from '../utils/hash';
 
 const { withTryCatch } = new Wrapper("School");
 
 export const createTeacher = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
    const validatePayload = createTeacherSchema.safeParse({
       schoolId: Number(req.params.schoolId),
       ...req.body,
@@ -18,6 +19,7 @@ export const createTeacher = withTryCatch(async (handlers, prisma, errors) => {
    }
 
    const { firstName, surname, schoolId, username, password } = validatePayload.data;
+   const hashedPassword = await hashPassword(password);
 
    const school = await prisma.school.findUnique({
       where: { id: Number(schoolId) },
@@ -30,15 +32,16 @@ export const createTeacher = withTryCatch(async (handlers, prisma, errors) => {
    if (teacherExist) return errors.conflict();
 
    const newTeacher = await prisma.teacher.create({
-      data: { firstName, surname, schoolId, username, password },
+      data: { firstName, surname, schoolId, username, password: hashedPassword },
    });
 
    res.status(201).json(newTeacher);
 });
 
 export const updateTeacher = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
    const { body, params } = req;
+   let hasPassword = undefined;
 
    const validation = updateTeacherSchema.safeParse({
       teacherId: Number(params.teacherId),
@@ -53,16 +56,20 @@ export const updateTeacher = withTryCatch(async (handlers, prisma, errors) => {
       return errors.validation('First name, surname, username or password is required.');
    }
 
+   if (password) {
+      hasPassword = await hashPassword(password);
+   }
+
    const updatedTeacher = await prisma.teacher.update({
       where: { id: teacherId, schoolId },
-      data: { firstName, surname, username, password },
+      data: { firstName, surname, username, password: hasPassword },
    });
 
    res.status(200).json(updatedTeacher);
 });
 
 export const deleteTeacher = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
    const { schoolId, teacherId } = req.params;
 
    if (!schoolId || !teacherId) {
@@ -85,7 +92,7 @@ export const deleteTeacher = withTryCatch(async (handlers, prisma, errors) => {
 });
 
 export const listTeachers = withTryCatch(async (handlers, prisma, errors) => {
-   const { req, res, next } = handlers;
+   const { req, res } = handlers;
 
    const validatePayload = getTeachersSchema.safeParse({
       schoolId: Number(req.params.schoolId),

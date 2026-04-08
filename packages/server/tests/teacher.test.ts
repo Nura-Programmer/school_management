@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import schoolMocks from './common/schools.mocks';
 import teacherMocks from './common/teachers.mocks';
+import { comparePassword } from '../src/utils/hash';
 
 describe('Teacher API', async () => {
    const { info: schoolInfo } = schoolMocks;
@@ -144,8 +145,12 @@ describe('Teacher API', async () => {
          .toBe(updatedInfo.firstName);
       expect(updateSurname.body.surname, "to update teacher's surname")
          .toBe(updatedInfo.surname);
-      expect(updatePassword.body.password, "to update teacher's password")
-         .toBe(updatedInfo.password);
+
+      const isCorrectPassword = await comparePassword(
+         updatedInfo.password, updatePassword.body.password
+      );
+      expect(isCorrectPassword, "to update teacher's password")
+         .toBe(true);
 
    });
 

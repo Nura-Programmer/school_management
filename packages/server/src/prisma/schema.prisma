@@ -7,7 +7,7 @@ datasource db {
 }
 
 model School {
-  id        Int          @id @default(autoincrement())
+  id        String       @id @default(cuid(2)) @db.VarChar(30)
   name      String       @unique @db.VarChar(191)
   code      String       @unique @db.VarChar(8)
   town      String       @db.VarChar(50)
@@ -21,12 +21,12 @@ model School {
 }
 
 model Teacher {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid(2)) @db.VarChar(30)
   firstName String   @db.VarChar(100)
   surname   String   @db.VarChar(100)
   username  String   @unique @db.VarChar(40) // Auto generate E.g. username@schoolCode.town
   password  String   @db.VarChar(255)
-  schoolId  Int
+  schoolId  String   @db.VarChar(30)
   createdAt DateTime @default(now())
   school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
@@ -35,9 +35,9 @@ model Teacher {
 }
 
 model ClassModel {
-  id       Int       @id @default(autoincrement())
+  id       String    @id @default(cuid(2)) @db.VarChar(30)
   name     String    @db.VarChar(100)
-  schoolId Int
+  schoolId String    @db.VarChar(30)
   school   School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   subjects Subject[]
   students Student[]
@@ -47,9 +47,9 @@ model ClassModel {
 }
 
 model Subject {
-  id      Int        @id @default(autoincrement())
+  id      String     @id @default(cuid(2)) @db.VarChar(30)
   name    String     @db.VarChar(100)
-  classId Int
+  classId String     @db.VarChar(30)
   class   ClassModel @relation(fields: [classId], references: [id], onDelete: Cascade)
   marks   Mark[]
 
@@ -58,11 +58,11 @@ model Subject {
 }
 
 model Student {
-  id        Int        @id @default(autoincrement())
+  id        String     @id @default(cuid(2)) @db.VarChar(30)
   name      String     @db.VarChar(100)
   classType String     @db.VarChar(1)
-  classId   Int
-  schoolId  Int
+  classId   String     @db.VarChar(30)
+  schoolId  String     @db.VarChar(30)
   class     ClassModel @relation(fields: [classId], references: [id], onDelete: Cascade)
   school    School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   marks     Mark[]
@@ -72,12 +72,12 @@ model Student {
 }
 
 model Mark {
-  id        Int @id @default(autoincrement())
+  id        String @id @default(cuid(2)) @db.VarChar(30)
   ca        Int
   test      Int
   exam      Int
-  studentId Int
-  subjectId Int
+  studentId String @db.VarChar(30)
+  subjectId String @db.VarChar(30)
 
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
   subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)

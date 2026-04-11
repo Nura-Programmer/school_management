@@ -5,118 +5,78 @@ import { comparePassword } from '../src/utils/hash';
 
 describe('Teacher API', async () => {
    const { info: schoolInfo } = schoolMocks;
+   const { info: teacherInfo } = teacherMocks;
 
    it('create a teacher under a school', async () => {
-      const school = await schoolMocks.create(schoolInfo);
+      const { body, status } = await schoolMocks.create(schoolInfo);
+      const { school, teacher } = body;
 
-      const { info: teacherInfo } = teacherMocks;
-      const res = await teacherMocks.create({
-         schoolId: school.body.id,
-         ...teacherInfo,
-      });
-
-      expect(res.status).toBe(201);
-      expect(res.body).toHaveProperty('id');
-      expect(res.body.firstName).toBe(teacherInfo.firstName);
+      expect(status).toBe(201);
+      expect(teacher).toHaveProperty('id');
+      expect(teacher.firstName).toBe(teacherInfo.firstName);
    });
 
    it('returns 400 if firstName is missing', async () => {
-      const school = await schoolMocks.create(schoolInfo);
-      const { firstName: _, ...teacherWithOutFirstName } = teacherMocks.info
-
-      const response = await teacherMocks.create({
-         schoolId: school.body.id,
-         ...teacherWithOutFirstName
-      });
+      const { firstName: _, ...teacherWithOutFirstName } = schoolInfo;
+      const response = await schoolMocks.create(teacherWithOutFirstName);
 
       expect(response.status).toBe(400);
    });
 
    it('returns 400 if surname is missing', async () => {
-      const school = await schoolMocks.create(schoolInfo);
-      const { surname: _, ...teacherWithOutSurname } = teacherMocks.info;
-
-      const response = await teacherMocks.create({
-         schoolId: school.body.id,
-         ...teacherWithOutSurname
-      });
+      const { surname: _, ...teacherWithOutSurname } = schoolInfo;
+      const response = await schoolMocks.create(teacherWithOutSurname);
 
       expect(response.status).toBe(400);
    });
 
-   it('returns 400 if schoolId is missing', async () => {
-      const response = await teacherMocks.create({
-         schoolId: null,
-         ...teacherMocks.info,
-      });
+   it('returns 404 if schoolId is missing', async () => {
+      const response = await teacherMocks.create({ ...teacherInfo, schoolId: null })
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(404);
    });
 
    it('returns 404 if school does not exist', async () => {
-      const response = await teacherMocks.create({
-         schoolId: 999,
-         ...teacherMocks.info,
-      });
+      const response = await teacherMocks.create({ ...teacherInfo, schoolId: "999" });
 
       expect(response.status).toBe(404);
    });
 
    it('returns 409 if teacher already exists in the same school', async () => {
-      const school = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
 
-      const firstTeacherRes = await teacherMocks.create({
-         schoolId: school.body.id,
-         ...teacherMocks.info,
+      const { status, body } = await teacherMocks.create({
+         ...teacherInfo, schoolId: school.id
       });
 
-      const secondTeacherRes = await teacherMocks.create({
-         schoolId: school.body.id,
-         ...teacherMocks.info,
-      });
-      expect(secondTeacherRes.status).toBe(409);
-      expect(secondTeacherRes.body.error).toBe('Conflict');
+      expect(status).toBe(409);
+      expect(body.error).toBe('Conflict');
    });
 
    it('returns paginated teachers for a school', async () => {
-      const school = await schoolMocks.create(schoolInfo);
-
-      const firstTeacherRes = await teacherMocks.create({
-         schoolId: school.body.id,
-         ...teacherMocks.info,
-      });
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
 
       const secondTeacherRes = await teacherMocks.create({
-         schoolId: school.body.id,
+         schoolId: school.id,
          firstName: 'TeacherName',
          surname: 'TeacherSurname',
          username: "teacherusername",
-         password: teacherMocks.info.password
+         password: teacherInfo.password
+      });
+      const { status, body } = await teacherMocks.getTeachers({
+         page: 1, limit: 1, schoolId: school.id
       });
 
-      const teachers = await teacherMocks.getTeachers({
-         schoolId: school.body.id,
-         page: 1,
-         limit: 1,
-      });
-      expect(teachers.status).toBe(200);
-      expect(teachers.body.data.length).toBe(1);
-      expect(teachers.body.meta).toEqual({
-         page: 1,
-         limit: 1,
-         hasNext: true,
-      });
+      expect(status).toBe(200);
+      expect(body.data.length).toBe(1);
+      expect(body.meta).toEqual({ page: 1, limit: 1, hasNext: true });
    });
 
    it('should updates a teacher', async () => {
-      const school = await schoolMocks.create(schoolInfo);
-
-      const { info: teacherInfo } = teacherMocks;
-      const teacher = await teacherMocks.create({
-         schoolId: school.body.id,
-         ...teacherInfo,
-      });
-
+      const response = await schoolMocks.create(schoolInfo);
+      const { school, teacher } = response.body;
       const updatedInfo = {
          firstName: 'updatedFirstName',
          surname: 'updatedSurname',
@@ -124,21 +84,15 @@ describe('Teacher API', async () => {
       };
 
       const updateFirstName = await teacherMocks.update({
-         id: teacher.body.id,
-         schoolId: school.body.id,
-         firstName: updatedInfo.firstName,
+         id: teacher.id, schoolId: school.id, firstName: updatedInfo.firstName,
       });
 
       const updateSurname = await teacherMocks.update({
-         id: teacher.body.id,
-         schoolId: school.body.id,
-         surname: updatedInfo.surname,
+         id: teacher.id, schoolId: school.id, surname: updatedInfo.surname,
       });
 
       const updatePassword = await teacherMocks.update({
-         id: teacher.body.id,
-         schoolId: school.body.id,
-         password: updatedInfo.password,
+         id: teacher.id, schoolId: school.id, password: updatedInfo.password,
       });
 
       expect(updateFirstName.body.firstName, "to update teacher's first name")
@@ -155,20 +109,12 @@ describe('Teacher API', async () => {
    });
 
    it('should delete a teacher', async () => {
-      const school = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school, teacher } = response.body;
 
-      const { info: teacherInfo } = teacherMocks;
-      const teacher = await teacherMocks.create({
-         schoolId: school.body.id,
-         ...teacherInfo,
-      });
-
-      const deletedTeacher = await teacherMocks.delete(
-         teacher.body.id,
-         school.body.id
-      );
+      const deletedTeacher = await teacherMocks.delete(teacher.id, school.id);
 
       expect(deletedTeacher.status).toBe(200);
-      expect(deletedTeacher.body.id).toBe(teacher.body.id);
+      expect(deletedTeacher.body.id).toBe(teacher.id);
    });
 });

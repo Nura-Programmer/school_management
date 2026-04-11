@@ -7,18 +7,18 @@ type CreateTeacherProps = {
    surname?: string | null;
    username?: string | null;
    password?: string | null;
-   schoolId: number | null;
+   schoolId: string | null;
 };
 
-type UpdateTeacherProps = { id: number } & CreateTeacherProps;
+type UpdateTeacherProps = { id: string } & CreateTeacherProps;
 
 type GetTeachersProps = {
-   schoolId: number;
+   schoolId: string;
    page?: number;
    limit?: number;
 };
 
-const teacherApi = (schoolId: number | null) =>
+const teacherApi = (schoolId: string | null) =>
    `/api/schools/${schoolId}/teachers`;
 
 const teacherMocks = {
@@ -46,12 +46,12 @@ const teacherMocks = {
 
       return await withTestPrisma(
          request(app)
-            .put(`${teacherApi(schoolId)}/${id}`)
+            .put(`${teacherApi(schoolId ?? "")}/${id}`)
             .send(payload)
       );
    },
 
-   delete: async (id: number, schoolId: number) => {
+   delete: async (id: string, schoolId: string) => {
       return await withTestPrisma(
          request(app)
             .delete(`${teacherApi(schoolId)}/${id}`)

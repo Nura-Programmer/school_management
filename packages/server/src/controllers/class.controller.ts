@@ -3,12 +3,14 @@ import Wrapper from '../middleware/wrapper';
 
 const { withTryCatch } = new Wrapper("School");
 
+type Params = { schoolId: string, classId: string }
+
 export const createClass = withTryCatch(async (handlers, prisma, errors) => {
    const { req, res } = handlers;
+   const params = req.params as Params;
 
    const validatePayload = createClassSchema.safeParse({
-      ...req.body,
-      schoolId: Number(req.params.schoolId),
+      ...req.body, schoolId: params.schoolId,
    });
 
    if (!validatePayload.success) {
@@ -33,7 +35,7 @@ export const createClass = withTryCatch(async (handlers, prisma, errors) => {
 export const updateClass = withTryCatch(async (handlers, prisma, errors) => {
    const { req, res } = handlers;
 
-   const { classId, schoolId } = req.params;
+   const { classId, schoolId } = req.params as Params;
    const { name } = req.body;
    if (!classId || !schoolId || !name) {
       return errors.validation(
@@ -42,13 +44,12 @@ export const updateClass = withTryCatch(async (handlers, prisma, errors) => {
    }
 
    const classExist = await prisma.classModel.findFirst({
-      where: { id: Number(classId), schoolId: Number(schoolId) },
+      where: { id: classId, schoolId },
    });
    if (!classExist) return errors.notFound();
 
    const updatedClass = await prisma.classModel.update({
-      where: { id: Number(classId), schoolId: Number(schoolId) },
-      data: { name },
+      where: { id: classId, schoolId }, data: { name },
    });
 
    res.status(200).json(updatedClass);
@@ -57,18 +58,18 @@ export const updateClass = withTryCatch(async (handlers, prisma, errors) => {
 export const deleteClass = withTryCatch(async (handlers, prisma, errors) => {
    const { req, res } = handlers;
 
-   const { classId, schoolId } = req.params;
+   const { classId, schoolId } = req.params as Params;
    if (!classId || !schoolId) {
       return errors.validation('Both School ID and Class ID are required.');
    }
 
    const classExist = await prisma.classModel.findFirst({
-      where: { id: Number(classId), schoolId: Number(schoolId) },
+      where: { id: classId, schoolId },
    });
    if (!classExist) return errors.notFound();
 
    const deletedClass = await prisma.classModel.delete({
-      where: { id: Number(classId), schoolId: Number(schoolId) },
+      where: { id: classId, schoolId },
    });
 
    res.status(200).json({ id: deletedClass.id });
@@ -76,9 +77,10 @@ export const deleteClass = withTryCatch(async (handlers, prisma, errors) => {
 
 export const listClasses = withTryCatch(async (handlers, prisma, errors) => {
    const { req, res } = handlers;
+   const params = req.params as Params;
 
    const validatePayload = getClassSchema.safeParse({
-      schoolId: Number(req.params.schoolId),
+      schoolId: params.schoolId,
       page: Number(req.query.page),
       limit: Number(req.query.limit),
    });
@@ -93,17 +95,11 @@ export const listClasses = withTryCatch(async (handlers, prisma, errors) => {
    const schoolId = validated.schoolId;
 
    const classes = await prisma.classModel.findMany({
-      where: { schoolId },
-      skip,
-      take: limit + 1,
-      orderBy: { id: 'desc' },
+      where: { schoolId }, skip, take: limit + 1, orderBy: { id: 'desc' },
    });
 
    const hasNext = classes.length > limit;
    if (hasNext) classes.pop();
 
-   res.json({
-      data: classes,
-      meta: { page, limit, hasNext },
-   });
+   res.json({ data: classes, meta: { page, limit, hasNext } });
 });

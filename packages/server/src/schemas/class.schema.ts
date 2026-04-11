@@ -5,11 +5,11 @@ export const createClassSchema = z.object({
       .string()
       .min(1, 'Class name is required')
       .max(100, 'Class name cannot exist 100 characters.'),
-   schoolId: z.number('Class ID must be a number.'),
+   schoolId: z.cuid2('Invlaid Class ID.'),
 });
 
 export const getClassSchema = z.object({
-   schoolId: z.number('School ID must be a number.'),
+   schoolId: z.cuid2('Invalid School ID'),
    page: z.number().optional(),
    limit: z.number().optional(),
 });

@@ -3,25 +3,23 @@ import app from '../../src/app';
 import { withTestPrisma } from '../helpers/withTestPrisma';
 
 type CreateClassProps = {
-   schoolId: number;
+   schoolId: string;
    name?: string | number | null;
 };
 
-type UpdateClassProps = { id: number } & CreateClassProps;
+type UpdateClassProps = { id: string } & CreateClassProps;
 
 type GetClassProps = {
-   schoolId: number;
+   schoolId: string;
    page?: number;
    limit?: number;
 };
 
-const classesApi = (schoolId: number | null) =>
+const classesApi = (schoolId: string | null) =>
    `/api/schools/${schoolId}/classes`;
 
 const classMocks = {
-   info: {
-      name: 'JSS 1',
-   },
+   info: { name: 'JSS 1' },
 
    create: async ({ schoolId, name }: CreateClassProps) => {
       return await withTestPrisma(
@@ -37,7 +35,7 @@ const classMocks = {
       );
    },
 
-   delete: async (classId: number, schoolId: number) => {
+   delete: async (classId: string, schoolId: string) => {
       return await withTestPrisma(
          request(app).delete(`${classesApi(schoolId)}/${classId}`)
       );

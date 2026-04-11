@@ -4,117 +4,112 @@ import classMocks from './common/classes.mocks';
 
 describe('Class API', () => {
    const { info: schoolInfo } = schoolMocks;
+   const { info: classInfo } = classMocks;
 
    it('Schould create a class under a school', async () => {
-      const school = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
+
 
       const classResponse = await classMocks.create({
-         schoolId: school.body.id,
-         ...classMocks.info,
+         ...classInfo, schoolId: school.id
       });
+
+      console.log(school, classResponse.body)
       expect(classResponse.status).toBe(201);
       expect(classResponse.body).toHaveProperty('id');
-      expect(classResponse.body.name).toBe(classMocks.info.name);
+      expect(classResponse.body.name).toBe(classInfo.name);
    });
 
    it('returns 400 when payload is empty', async () => {
-      const school = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
 
-      const classResponse = await classMocks.create({
-         schoolId: school.body.id,
-      });
+      const classResponse = await classMocks.create({ schoolId: school.id });
       expect(classResponse.status).toBe(400);
    });
 
    it('returns 400 when name is not a string', async () => {
-      const school = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
 
       const classResponse = await classMocks.create({
-         schoolId: school.body.id,
-         name: 123,
+         schoolId: school.id, name: 123,
       });
       expect(classResponse.status).toBe(400);
    });
 
    it('returns structured valiadation error when name is empty', async () => {
-      const school = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
 
       const classResponse = await classMocks.create({
-         schoolId: school.body.id,
-         name: '',
+         schoolId: school.id, name: '',
       });
       expect(classResponse.status).toBe(400);
    });
 
    it('returns 409 when class already exist under the school', async () => {
-      const school = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
 
       const firstClass = await classMocks.create({
-         schoolId: school.body.id,
-         ...classMocks.info,
+         ...classInfo, schoolId: school.id,
+      });
+      const secondClass = await classMocks.create({
+         ...classInfo, schoolId: school.id,
       });
 
-      const secondClass = await classMocks.create({
-         schoolId: school.body.id,
-         ...classMocks.info,
-      });
       expect(secondClass.status).toBe(409);
       expect(secondClass.body.error).toBe('Conflict');
    });
 
    it('returns paginated classes of a school', async () => {
-      const school = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
 
       const firstClass = await classMocks.create({
-         schoolId: school.body.id,
-         ...classMocks.info,
+         ...classInfo, schoolId: school.id,
       });
 
       const secondClass = await classMocks.create({
-         schoolId: school.body.id,
-         name: 'JSS 2',
+         schoolId: school.id, name: 'JSS 2',
       });
 
       const classes = await classMocks.getClasses({
-         schoolId: school.body.id,
-         page: 1,
-         limit: 1,
+         schoolId: school.id, page: 1, limit: 1,
       });
 
       expect(classes.status).toBe(200);
       expect(classes.body.data.length).toBe(1);
       expect(classes.body.meta).toEqual({
-         page: 1,
-         limit: 1,
-         hasNext: true,
+         page: 1, limit: 1, hasNext: true,
       });
    });
 
    it('should update a class', async () => {
       const newName = 'updatedName';
-      const school = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
 
       const classResponse = await classMocks.create({
-         schoolId: school.body.id,
-         ...classMocks.info,
+         ...classInfo, schoolId: school.id,
       });
 
       const { id: classId, schoolId } = classResponse.body;
       const updatedName = await classMocks.update({
-         id: classId,
-         schoolId,
-         name: newName,
+         id: classId, schoolId, name: newName,
       });
 
       expect(updatedName.body.name, 'to update class name').toBe(newName);
    });
 
    it('should delete a class', async () => {
-      const school = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
 
       const classResponse = await classMocks.create({
-         schoolId: school.body.id,
-         ...classMocks.info,
+         ...classInfo, schoolId: school.id,
       });
 
       const { id: classId, schoolId } = classResponse.body;

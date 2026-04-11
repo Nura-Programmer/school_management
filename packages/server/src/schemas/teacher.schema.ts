@@ -18,12 +18,12 @@ export const teacherScheme = z.object({
 });
 
 export const createTeacherSchema = teacherScheme.and(z.object({
-   schoolId: z.number('School ID must be a number.'),
+   schoolId: z.cuid2('Invalid School ID.'),
 }));
 
 export const updateTeacherSchema = z.object({
-   teacherId: z.number('Teacher ID must be a number.'),
-   schoolId: z.number('School ID must be a number.'),
+   teacherId: z.cuid2('Invalid Teacher ID.'),
+   schoolId: z.cuid2('Invalid School ID.'),
    firstName: z.string()
       .min(3, 'First name must be atleat 3 characters.')
       .max(100, 'First name must not exceed 100 characters.')
@@ -41,7 +41,7 @@ export const updateTeacherSchema = z.object({
 });
 
 export const getTeachersSchema = z.object({
-   schoolId: z.number('School ID must be a number.'),
+   schoolId: z.cuid2('Invalid School ID.'),
    page: z.number().optional(),
    limit: z.number().optional(),
 });

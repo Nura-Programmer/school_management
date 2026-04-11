@@ -1,7 +1,5 @@
 import {
-   createTeacherSchema,
-   getTeachersSchema,
-   updateTeacherSchema,
+   createTeacherSchema, getTeachersSchema, updateTeacherSchema,
 } from '../schemas/teacher.schema';
 import Wrapper from '../middleware/wrapper';
 import { hashPassword } from '../utils/hash';
@@ -10,8 +8,10 @@ const { withTryCatch } = new Wrapper("School");
 
 export const createTeacher = withTryCatch(async (handlers, prisma, errors) => {
    const { req, res } = handlers;
+   const { body, params } = req;
+
    const validatePayload = createTeacherSchema.safeParse({
-      schoolId: Number(req.params.schoolId),
+      schoolId: params.schoolId,
       ...req.body,
    });
    if (!validatePayload.success) {
@@ -19,10 +19,9 @@ export const createTeacher = withTryCatch(async (handlers, prisma, errors) => {
    }
 
    const { firstName, surname, schoolId, username, password } = validatePayload.data;
-   const hashedPassword = await hashPassword(password);
 
    const school = await prisma.school.findUnique({
-      where: { id: Number(schoolId) },
+      where: { id: schoolId },
    });
    if (!school) return errors.notFound();
 
@@ -31,6 +30,7 @@ export const createTeacher = withTryCatch(async (handlers, prisma, errors) => {
    });
    if (teacherExist) return errors.conflict();
 
+   const hashedPassword = await hashPassword(password);
    const newTeacher = await prisma.teacher.create({
       data: { firstName, surname, schoolId, username, password: hashedPassword },
    });
@@ -44,9 +44,7 @@ export const updateTeacher = withTryCatch(async (handlers, prisma, errors) => {
    let hasPassword = undefined;
 
    const validation = updateTeacherSchema.safeParse({
-      teacherId: Number(params.teacherId),
-      schoolId: Number(params.schoolId),
-      ...body,
+      teacherId: params.teacherId, schoolId: params.schoolId, ...body,
    });
    if (!validation.success)
       return errors.validation(validation.error.message);
@@ -70,7 +68,7 @@ export const updateTeacher = withTryCatch(async (handlers, prisma, errors) => {
 
 export const deleteTeacher = withTryCatch(async (handlers, prisma, errors) => {
    const { req, res } = handlers;
-   const { schoolId, teacherId } = req.params;
+   const { schoolId, teacherId } = req.params as { schoolId: string, teacherId: string };
 
    if (!schoolId || !teacherId) {
       return errors.validation(
@@ -79,13 +77,13 @@ export const deleteTeacher = withTryCatch(async (handlers, prisma, errors) => {
    }
 
    const teacherExist = await prisma.teacher.findFirst({
-      where: { id: Number(teacherId), schoolId: Number(schoolId) },
+      where: { id: teacherId, schoolId: schoolId },
    });
 
    if (!teacherExist) return errors.notFound();
 
    const deletedTeacher = await prisma.teacher.delete({
-      where: { id: Number(teacherId), schoolId: Number(schoolId) },
+      where: { id: teacherId, schoolId: schoolId },
    });
 
    res.status(200).json({ id: deletedTeacher.id });
@@ -95,7 +93,7 @@ export const listTeachers = withTryCatch(async (handlers, prisma, errors) => {
    const { req, res } = handlers;
 
    const validatePayload = getTeachersSchema.safeParse({
-      schoolId: Number(req.params.schoolId),
+      schoolId: req.params.schoolId,
       page: Number(req.query.page),
       limit: Number(req.query.limit),
    });

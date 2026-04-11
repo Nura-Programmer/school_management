@@ -3,58 +3,46 @@ import { withTestPrisma } from '../helpers/withTestPrisma';
 import app from '../../src/app';
 
 type CreateSubjectProps = {
-   schoolId?: number | null;
-   classId?: number | null;
+   schoolId?: string | null;
+   classId?: string | null;
    name?: string | number | null;
 };
 
 type UpdateSubjectProps = {
-   schoolId: number;
-   classId: number;
-   subjectId: number;
+   schoolId: string;
+   classId: string;
+   subjectId: string;
    name: string;
 };
 
 type GetSubjectsProps = {
-   schoolId?: number | null;
-   classId?: number | null;
+   schoolId?: string | null;
+   classId?: string | null;
 };
 
-const subjectsApi = (schoolId?: number | null, classId?: number | null) =>
+const subjectsApi = (schoolId?: string | null, classId?: string | null) =>
    `/api/schools/${schoolId}/classes/${classId}/subjects`;
 
 const subjectMocks = {
-   info: {
-      name: 'mathematics',
-   },
+   info: { name: 'mathematics' },
 
    create: async ({ schoolId, classId, name }: CreateSubjectProps) => {
       return await withTestPrisma(
-         request(app).post(subjectsApi(schoolId, classId)).send({
-            name,
-            classId,
-         })
+         request(app).post(subjectsApi(schoolId, classId)).send({ name, classId })
       );
    },
 
-   update: async ({
-      subjectId,
-      classId,
-      schoolId,
-      name,
-   }: UpdateSubjectProps) => {
+   update: async ({ subjectId, classId, schoolId, name }: UpdateSubjectProps) => {
       return await withTestPrisma(
          request(app)
-            .put(`${subjectsApi(schoolId, classId)}/${subjectId}`)
-            .send({ name })
+            .put(`${subjectsApi(schoolId, classId)}/${subjectId}`).send({ name })
       );
    },
 
-   delete: async (schoolId: number, classId: number, subjectId: number) => {
+   delete: async (schoolId: string, classId: string, subjectId: string) => {
       return await withTestPrisma(
          request(app)
-            .delete(`${subjectsApi(schoolId, classId)}/${subjectId}`)
-            .send()
+            .delete(`${subjectsApi(schoolId, classId)}/${subjectId}`).send()
       );
    },
 

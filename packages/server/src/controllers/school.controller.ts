@@ -16,7 +16,7 @@ export const createSchool = withTryCatch(async (handlers, prisma, errors) => {
       name, code, town, address, firstName, surname, username, password
    } = validatePayload.data;
    const schoolExist = await prisma.school.findFirst({
-      where: { name, code, town, address },
+      where: { name, code, town },
    });
    if (schoolExist) return errors.conflict();
 
@@ -36,13 +36,13 @@ export const createSchool = withTryCatch(async (handlers, prisma, errors) => {
       }
    });
 
-   res.status(201).json({ ...teacher, ...school });
+   res.status(201).json({ school, teacher });
 })
 
 export const updateSchool = withTryCatch(async (handlers, prisma, errors) => {
    const { req, res } = handlers;
    const { name, code, town, address } = req.body;
-   const schoolId = Number(req.params.schoolId);
+   const schoolId = req.params.schoolId as string;
 
    if (!schoolId) return errors.validation('School ID is required.');
    if (!name && !address)
@@ -64,7 +64,7 @@ export const updateSchool = withTryCatch(async (handlers, prisma, errors) => {
 
 export const deleteSchool = withTryCatch(async (handlers, prisma, errors) => {
    const { req, res } = handlers;
-   const schoolId = Number(req.params.schoolId);
+   const schoolId = req.params.schoolId as string;
    if (!schoolId) return errors.validation('School ID is required.');
 
    const schoolExist = await prisma.school.findFirst({

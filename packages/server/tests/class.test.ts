@@ -15,7 +15,6 @@ describe('Class API', () => {
          ...classInfo, schoolId: school.id
       });
 
-      console.log(school, classResponse.body)
       expect(classResponse.status).toBe(201);
       expect(classResponse.body).toHaveProperty('id');
       expect(classResponse.body.name).toBe(classInfo.name);

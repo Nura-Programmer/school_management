@@ -5,48 +5,32 @@ import { withTestPrisma } from '../helpers/withTestPrisma';
 type CreateStudentProps = {
    name?: number | string | null;
    classType?: string | null;
-   schoolId?: number;
-   classId?: number;
+   schoolId?: string;
+   classId?: string;
 };
 
 type UpdateStudentProps = {
-   schoolId: number;
-   classId: number;
-   studentId: number;
+   schoolId: string;
+   classId: string;
+   studentId: string;
    name: string;
 };
 
-const studentsApi = (schoolId?: number | null, classId?: number | null) =>
+const studentsApi = (schoolId?: string | null, classId?: string | null) =>
    `/api/schools/${schoolId}/classes/${classId}/students`;
 
 const studentMocks = {
-   info: {
-      name: 'studentName',
-      classType: 'A',
-   },
+   info: { name: 'studentName', classType: 'A' },
 
-   create: async ({
-      schoolId,
-      classId,
-      name,
-      classType,
-   }: CreateStudentProps) => {
+   create: async ({ schoolId, classId, name, classType }: CreateStudentProps) => {
       return await withTestPrisma(
          request(app).post(studentsApi(schoolId, classId)).send({
-            name,
-            classType,
-            classId,
-            schoolId,
+            name, classType, classId, schoolId,
          })
       );
    },
 
-   update: async ({
-      studentId,
-      classId,
-      schoolId,
-      name,
-   }: UpdateStudentProps) => {
+   update: async ({ studentId, classId, schoolId, name, }: UpdateStudentProps) => {
       return await withTestPrisma(
          request(app)
             .put(`${studentsApi(schoolId, classId)}/${studentId}`)
@@ -54,7 +38,7 @@ const studentMocks = {
       );
    },
 
-   delete: async (schoolId: number, classId: number, studentId: number) => {
+   delete: async (schoolId: string, classId: string, studentId: string) => {
       return await withTestPrisma(
          request(app)
             .delete(`${studentsApi(schoolId, classId)}/${studentId}`)

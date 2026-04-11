@@ -13,18 +13,12 @@ export const createMark = withTryCatch(async (handlers, prisma, errors) => {
 
    const { ca, test, exam, studentId, subjectId } = validatePayload.data;
 
-   const markExist = await prisma.mark.findFirst({
-      where: { studentId, subjectId },
-   });
+   const markExist = await prisma.mark.findFirst({ where: { studentId, subjectId } });
    if (markExist) return errors.conflict();
 
    const newMark = await prisma.mark.create({
       data: {
-         ca: Number(ca),
-         test: Number(test),
-         exam: Number(exam),
-         studentId,
-         subjectId,
+         ca: Number(ca), test: Number(test), exam: Number(exam), studentId, subjectId
       },
    });
 
@@ -40,15 +34,10 @@ export const updateMark = withTryCatch(async (handlers, prisma, errors) => {
    }
 
    const { ca, test, exam, id } = validatePayload.data;
-   const markExist = await prisma.mark.findFirst({
-      where: { id },
-   });
+   const markExist = await prisma.mark.findFirst({ where: { id } });
    if (!markExist) return errors.notFound();
 
-   const updatedMark = await prisma.mark.update({
-      where: { id },
-      data: { ca, test, exam },
-   });
+   const updatedMark = await prisma.mark.update({ where: { id }, data: { ca, test, exam } });
 
    res.status(200).json(updatedMark);
 });

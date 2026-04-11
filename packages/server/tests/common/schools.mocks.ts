@@ -15,7 +15,7 @@ type CreateSchoolProps = {
    password?: string | null;
 };
 
-type UpdateSchoolProps = { id: number } & CreateSchoolProps;
+type UpdateSchoolProps = { id: string } & CreateSchoolProps;
 
 type GetSchoolProps = {
    page?: number;

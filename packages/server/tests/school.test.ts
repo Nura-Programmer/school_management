@@ -5,20 +5,23 @@ describe('School API', () => {
    const schoolInfo = schoolMocks.info;
 
    it('should create a school', async () => {
-      const res = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
 
-      expect(res.status).toBe(201);
-      expect(res.body).toHaveProperty('id');
-      expect(res.body.name).toBe(schoolInfo.name);
+      expect(response.status).toBe(201);
+      expect(school).toHaveProperty('id');
+      expect(school.name).toBe(schoolInfo.name);
    });
 
    it('should create a school and a teacher', async () => {
-      const res = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school, teacher } = response.body;
 
-      expect(res.status).toBe(201);
-      expect(res.body).toHaveProperty('id');
-      expect(res.body.name).toBe(schoolInfo.name);
-      expect(res.body.username, "to register school with a teacher").toBe(schoolInfo.username);
+      expect(response.status).toBe(201);
+      expect(school).toHaveProperty('id');
+      expect(school.name).toBe(schoolInfo.name);
+      expect(teacher.username, "to register school with a teacher")
+         .toBe(schoolInfo.username);
    });
 
    it('returns 400 when payload is empty', async () => {
@@ -58,34 +61,27 @@ describe('School API', () => {
       const firstSchoolRes = await schoolMocks.create(schoolInfo);
 
       const secondSchoolRes = await schoolMocks.create({
-         ...schoolInfo,
-         name: 'Second School',
-         code: "00654321",
-         username: "nura2"
+         ...schoolInfo, name: 'Second School', code: "00654321", username: "nura2"
       });
 
       const schools = await schoolMocks.getSchools({ page: 1, limit: 1 });
       expect(schools.status).toBe(200);
       expect(schools.body.data.length).toBe(1);
       expect(schools.body.meta).toEqual({
-         page: 1,
-         limit: 1,
-         hasNext: true,
+         page: 1, limit: 1, hasNext: true,
       });
    });
 
    it('should updates a school', async () => {
       const school = await schoolMocks.create(schoolInfo);
-      const { id } = school.body;
+      const { id } = school.body.school;
       const updatedInfo = { name: 'updatedName', address: 'updatedAddress' };
 
       const updateName = await schoolMocks.update({
-         id,
-         name: updatedInfo.name,
+         id, name: updatedInfo.name,
       });
       const updateAddress = await schoolMocks.update({
-         id,
-         address: updatedInfo.address,
+         id, address: updatedInfo.address,
       });
 
       expect(updateName.body.name, 'to update school name').toBe(
@@ -98,8 +94,7 @@ describe('School API', () => {
 
    it('should delete a school', async () => {
       const school = await schoolMocks.create(schoolInfo);
-      const { id } = school.body;
-
+      const { id } = school.body.school;
       const deleteSchool = await schoolMocks.delete(id);
 
       expect(deleteSchool.status).toBe(200);

@@ -6,42 +6,35 @@ type createMarkProps = {
    ca?: number | string | null;
    test?: number | string | null;
    exam?: number | string | null;
-   schoolId: number | null;
-   classId: number | null;
-   subjectId: number | null;
-   studentId: number | null;
+   schoolId: string | null;
+   classId: string | null;
+   subjectId: string | null;
+   studentId: string | null;
 };
 
 type updateMarkProps = {
-   id: number;
-   schoolId: number;
-   classId: number;
+   id: string;
+   schoolId: string;
+   classId: string;
    ca?: number;
    exam?: number;
    test?: number;
 };
 
-const marksApi = (schoolId?: number | null, classId?: number | null) =>
+const marksApi = (schoolId?: string | null, classId?: string | null) =>
    `/api/schools/${schoolId}/classes/${classId}/marks`;
 
 const markMocks = {
-   info: {
-      ca: 15,
-      test: 18,
-      exam: 56,
-   },
+   info: { ca: 15, test: 18, exam: 56 },
 
    create: async (markInfo: createMarkProps) => {
-      const { schoolId, classId, subjectId, studentId, ca, test, exam } =
-         markInfo;
+      const {
+         schoolId, classId, subjectId, studentId, ca, test, exam
+      } = markInfo;
 
       return await withTestPrisma(
          request(app).post(marksApi(schoolId, classId)).send({
-            studentId,
-            subjectId,
-            ca,
-            test,
-            exam,
+            studentId, subjectId, ca, test, exam
          })
       );
    },
@@ -50,9 +43,7 @@ const markMocks = {
       const { id, schoolId, classId, ca, exam, test } = markProps;
 
       return await withTestPrisma(
-         request(app)
-            .put(marksApi(schoolId, classId))
-            .send({ id, ca, test, exam })
+         request(app).put(marksApi(schoolId, classId)).send({ id, ca, test, exam })
       );
    },
 };

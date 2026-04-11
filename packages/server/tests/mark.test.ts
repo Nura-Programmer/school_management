@@ -6,138 +6,128 @@ import markMocks from './common/marks.mocks';
 import subjectMocks from './common/subjects.mocks';
 
 describe('Marks API', () => {
-   it('create a mark for a specific student', async () => {
-      const { info: schoolInfo } = schoolMocks;
+   const { info: schoolInfo } = schoolMocks;
+   const { info: classInfo } = classMocks;
+   const { info: studentInfo } = studentMocks;
+   const { info: subjectInfo } = subjectMocks;
+   const { info: markInfo } = markMocks;
 
-      const school = await schoolMocks.create(schoolInfo);
+   it('create a mark for a specific student', async () => {
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
 
       const classResonse = await classMocks.create({
-         schoolId: school.body.id,
-         ...classMocks.info,
+         ...classInfo, schoolId: school.id,
       });
 
       const studentResponse = await studentMocks.create({
-         schoolId: school.body.id,
-         classId: classResonse.body.id,
-         ...studentMocks.info,
+         ...studentInfo, schoolId: school.id, classId: classResonse.body.id,
       });
 
       const subjectResponse = await subjectMocks.create({
-         schoolId: school.body.id,
-         classId: classResonse.body.id,
-         name: subjectMocks.info.name,
+         schoolId: school.id, classId: classResonse.body.id, name: subjectInfo.name
       });
 
       const markResponse = await markMocks.create({
-         schoolId: school.body.id,
+         ...markInfo,
+         schoolId: school.id,
          classId: classResonse.body.id,
          studentId: studentResponse.body.id,
          subjectId: subjectResponse.body.id,
-         ...markMocks.info,
       });
       expect(markResponse.status).toBe(201);
       expect(markResponse.body).toHaveProperty('id');
-      expect(markResponse.body.exam).toBe(markMocks.info.exam);
+      expect(markResponse.body.exam).toBe(markInfo.exam);
    });
 
    it('returns 400 validation error for schoolId, classId, sutdentId or subjectId', async () => {
-      const school = await schoolMocks.create(schoolMocks.info);
-      const classResonse = await classMocks.create({
-         schoolId: school.body.id,
-         ...classMocks.info,
-      });
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
+
+      const classResonse = await classMocks.create({ ...classInfo, schoolId: school.id });
       const subjectResponse = await subjectMocks.create({
-         schoolId: school.body.id,
-         classId: classResonse.body.id,
-         ...subjectMocks.info,
+         ...subjectInfo, schoolId: school.id, classId: classResonse.body.id
       });
       const studentResponse = await studentMocks.create({
-         schoolId: school.body.id,
-         classId: classResonse.body.id,
-         ...studentMocks.info,
+         ...studentInfo, schoolId: school.id, classId: classResonse.body.id
       });
       const markResponse = await markMocks.create({
-         schoolId: school.body.id,
+         ...markInfo,
+         schoolId: school.id,
          classId: classResonse.body.id,
          studentId: studentResponse.body.id,
          subjectId: subjectResponse.body.id,
-         ...markMocks.info,
       });
       const withOutSchoolId = await markMocks.create({
+         ...markInfo,
          schoolId: null,
          classId: classResonse.body.id,
          studentId: studentResponse.body.id,
          subjectId: subjectResponse.body.id,
-         ...markMocks.info,
       });
       const withOutClassId = await markMocks.create({
-         schoolId: school.body.id,
+         ...markInfo,
+         schoolId: school.id,
          classId: null,
          studentId: studentResponse.body.id,
          subjectId: subjectResponse.body.id,
-         ...markMocks.info,
       });
       const withOutStudentId = await markMocks.create({
-         schoolId: school.body.id,
+         ...markInfo,
+         schoolId: school.id,
          classId: classResonse.body.id,
          studentId: null,
          subjectId: subjectResponse.body.id,
-         ...markMocks.info,
       });
       const withOutSubjectId = await markMocks.create({
-         schoolId: school.body.id,
+         ...markInfo,
+         schoolId: school.id,
          classId: classResonse.body.id,
          studentId: studentResponse.body.id,
          subjectId: null,
-         ...markMocks.info,
       });
 
       const whenCAIsNaN = await markMocks.create({
-         schoolId: school.body.id,
+         ...markInfo,
+         schoolId: school.id,
          classId: classResonse.body.id,
          studentId: studentResponse.body.id,
          subjectId: subjectResponse.body.id,
-         ...markMocks.info,
          ca: Number('A'),
       });
       const whenTestIsNaN = await markMocks.create({
-         schoolId: school.body.id,
+         ...markInfo,
+         schoolId: school.id,
          classId: classResonse.body.id,
          studentId: studentResponse.body.id,
          subjectId: subjectResponse.body.id,
-         ...markMocks.info,
          test: Number('A'),
       });
       const whenExamIsNaN = await markMocks.create({
-         schoolId: school.body.id,
+         ...markInfo,
+         schoolId: school.id,
          classId: classResonse.body.id,
          studentId: studentResponse.body.id,
          subjectId: subjectResponse.body.id,
-         ...markMocks.info,
          exam: Number('A'),
       });
 
       expect(markResponse.status).toBe(201);
       expect(markResponse.body).toHaveProperty('id');
       expect(
-         withOutStudentId.status,
-         'return 400 when studentId is missing'
+         withOutStudentId.status, 'return 400 when studentId is missing'
       ).toBe(400);
       expect(
-         withOutSubjectId.status,
-         'return 400 when subjectId is missing'
+         withOutSubjectId.status, 'return 400 when subjectId is missing'
       ).toBe(400);
       expect(
-         whenCAIsNaN.body.error,
-         'returns validation error when ca is NaN'
+         whenCAIsNaN.body.error, 'returns validation error when ca is NaN'
       ).toBe('ValidationError');
       expect(
-         whenTestIsNaN.body.error,
-         'returns validation error when test is NaN'
+         whenTestIsNaN.body.error, 'returns validation error when test is NaN'
       ).toBe('ValidationError');
       expect(
-         whenExamIsNaN.body.error,
-         'returns validation error when exam is NaN'
+         whenExamIsNaN.body.error, 'returns validation error when exam is NaN'
       ).toBe('ValidationError');
    });
 
@@ -145,57 +135,38 @@ describe('Marks API', () => {
       const updatedInfo = { ca: 15, test: 19, exam: 48 };
       const { info: schoolInfo } = schoolMocks;
 
-      const school = await schoolMocks.create(schoolInfo);
+      const response = await schoolMocks.create(schoolInfo);
+      const { school } = response.body;
       const { id: schoolId } = school.body;
 
-      const classResonse = await classMocks.create({
-         schoolId,
-         ...classMocks.info,
-      });
+      const classResonse = await classMocks.create({ schoolId, ...classInfo });
       const { id: classId } = classResonse.body;
 
       const studentResponse = await studentMocks.create({
-         schoolId,
-         classId,
-         ...studentMocks.info,
+         ...studentInfo, schoolId, classId
       });
       const { id: studentId } = studentResponse.body;
 
       const subjectResponse = await subjectMocks.create({
-         schoolId,
-         classId,
-         name: subjectMocks.info.name,
+         schoolId, classId, name: subjectInfo.name,
       });
       const { id: subjectId } = subjectResponse.body;
 
       const markResponse = await markMocks.create({
-         schoolId,
-         classId,
-         studentId,
-         subjectId,
-         ...markMocks.info,
+         ...markInfo, schoolId, classId, studentId, subjectId,
       });
       const { id: markId } = markResponse.body;
 
       const updateCA = await markMocks.update({
-         id: Number(markId),
-         schoolId: Number(schoolId),
-         classId: Number(classId),
-         ca: updatedInfo.ca,
+         id: markId, schoolId, classId, ca: updatedInfo.ca,
       });
 
       const updateTest = await markMocks.update({
-         id: Number(markId),
-         schoolId: Number(schoolId),
-         classId: Number(classId),
-         test: updatedInfo.test,
+         id: markId, schoolId, classId, test: updatedInfo.test,
       });
 
       const updateExam = await markMocks.update({
-         id: Number(markId),
-         schoolId: Number(schoolId),
-         classId: Number(classId),
-         exam: updatedInfo.exam,
+         id: markId, schoolId, classId, exam: updatedInfo.exam,
       });
 
       expect(updateCA.body.ca, 'to update ca').toBe(updatedInfo.ca);

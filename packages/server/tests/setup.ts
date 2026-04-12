@@ -4,11 +4,7 @@ import { execSync } from 'child_process';
 
 beforeAll(() => {
    execSync('bun prisma migrate deploy', {
-      stdio: 'inherit',
-      env: {
-         ...process.env,
-         ENV: 'test',
-      },
+      stdio: 'inherit', env: { ...process.env, ENV: 'test' }
    });
 });
 

@@ -27,9 +27,12 @@
       "@prisma/client": "^7.3.0",
       "bcrypt": "^6.0.0",
       "express": "^5.2.1",
+      "express-mysql-session": "^3.0.3",
+      "express-session": "^1.19.0",
       "mysql2": "^3.16.1",
+      "passport": "^0.7.0",
+      "passport-local": "^1.0.0",
       "prisma": "^7.3.0",
-      "uuid": "^13.0.0",
       "zod": "^4.3.5"
    }
 }

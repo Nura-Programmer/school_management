@@ -29,6 +29,14 @@ const teacherMocks = {
       password: "secretPassword"
    },
 
+   login: async ({ schoolId, username, password }: { schoolId: string, username: string, password: string }) => {
+      return await withTestPrisma(
+         request(app).post(`/api/schools/${schoolId}/auth`).send({
+            username, password
+         })
+      );
+   },
+
    create: async ({ schoolId, firstName, surname, username, password }: CreateTeacherProps) => {
       return await withTestPrisma(
          request(app).post(teacherApi(schoolId)).send({

@@ -117,4 +117,13 @@ describe('Teacher API', async () => {
       expect(deletedTeacher.status).toBe(200);
       expect(deletedTeacher.body.id).toBe(teacher.id);
    });
+
+   it('login teacher', async () => {
+      const response = await schoolMocks.create(schoolInfo);
+      const { teacher } = response.body;
+      const { status, body } = await teacherMocks.login({ ...teacher, password: schoolInfo.password });
+
+      expect(status, "response status to be 200").toBe(200);
+      expect(body.isLogin, "response body to contain isLogin to be true").toBe(true);
+   });
 });

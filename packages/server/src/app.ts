@@ -1,4 +1,6 @@
 import express from 'express';
+import session from 'express-session';
+
 import schoolRoutes from './routes/school.routes';
 import { errorHandler } from './middleware/error.middleware';
 
@@ -10,6 +12,18 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(session({
+   name: 'sid',
+   secret: 'ssh!quiet,it\'ascret!',
+   resave: false,
+   saveUninitialized: false,
+   cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      sameSite: true,
+      secure: process.env.ENV === 'production'
+   },
+}));
 
 app.use('/api/schools', schoolRoutes);
 

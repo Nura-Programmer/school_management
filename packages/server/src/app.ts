@@ -6,6 +6,7 @@ import { errorHandler } from './middleware/error.middleware';
 import testRoutes from '../tests/__test__.routes';
 
 const app = express();
+app.disable('x-powered-by');
 
 const PORT = process.env.PORT || 3000;
 

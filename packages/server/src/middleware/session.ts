@@ -1,13 +1,16 @@
 import session from 'express-session';
+import { IN_PROD, SESS_NAME, SESS_PASS } from '../utils/config';
+
+const SESS_LIFE = 1000 * 60 * 60 * 24; // 1 day
 
 export default () => session({
-    name: 'sid',
-    secret: 'ssh!quiet,it\'ascret!',
+    name: SESS_NAME,
+    secret: SESS_PASS,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24, // 1 day
+        maxAge: SESS_LIFE,
         sameSite: true,
-        secure: process.env.ENV === 'production'
+        secure: IN_PROD
     },
 });

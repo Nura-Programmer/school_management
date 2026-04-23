@@ -30,12 +30,14 @@ import {
    updateStudent,
 } from '../controllers/student.controller';
 import { createMark, updateMark } from '../controllers/mark.controller';
+import { auth } from '../controllers/auth.controller';
 
 const router = Router();
 
 router.get('/', listSchools);
 router.post('/', createSchool);
 router.put('/:schoolId', updateSchool);
+router.post('/:schoolId/auth', auth);
 router.delete('/:schoolId', deleteSchool);
 
 router.get('/:schoolId/teachers', listTeachers);

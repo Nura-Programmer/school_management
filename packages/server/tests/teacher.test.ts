@@ -124,6 +124,6 @@ describe('Teacher API', async () => {
       const { status, body } = await teacherMocks.login({ ...teacher, password: schoolInfo.password });
 
       expect(status, "response status to be 200").toBe(200);
-      expect(body.isLogin, "response body to contain isLogin to be true").toBe(true);
+      expect(body.isAuthenticated, "response body to contain isAuthenticated to be true").toBe(true);
    });
 });

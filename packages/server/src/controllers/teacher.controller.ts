@@ -6,6 +6,11 @@ import { hashPassword } from '../utils/hash';
 
 const { withTryCatch } = new Wrapper("School");
 
+const removePassword = (teacher: { password: string }) => {
+   const { password, ...teacherWithoutPassword } = teacher;
+   return teacherWithoutPassword;
+};
+
 export const createTeacher = withTryCatch(async (handlers, prisma, errors) => {
    const { req, res } = handlers;
    const { body, params } = req;
@@ -35,7 +40,7 @@ export const createTeacher = withTryCatch(async (handlers, prisma, errors) => {
       data: { firstName, surname, schoolId, username, password: hashedPassword },
    });
 
-   res.status(201).json(newTeacher);
+   res.status(201).json(removePassword(newTeacher));
 });
 
 export const updateTeacher = withTryCatch(async (handlers, prisma, errors) => {
@@ -49,8 +54,8 @@ export const updateTeacher = withTryCatch(async (handlers, prisma, errors) => {
    if (!validation.success)
       return errors.validation(validation.error.message);
 
-   const { schoolId, teacherId, firstName, surname, username, password } = validation.data;
-   if (!firstName && !surname && !username && !password) {
+   const { schoolId, teacherId, firstName, surname, password } = validation.data;
+   if (!firstName && !surname && !password) {
       return errors.validation('First name, surname or password is required.');
    }
 
@@ -63,7 +68,7 @@ export const updateTeacher = withTryCatch(async (handlers, prisma, errors) => {
       data: { firstName, surname, password: hasPassword },
    });
 
-   res.status(200).json(updatedTeacher);
+   res.status(200).json(removePassword(updatedTeacher));
 });
 
 export const deleteTeacher = withTryCatch(async (handlers, prisma, errors) => {
@@ -113,11 +118,13 @@ export const listTeachers = withTryCatch(async (handlers, prisma, errors) => {
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
    });
 
-   const hasNext = teachers.length > limit;
-   if (hasNext) teachers.pop();
+   const teachersWithoutPassword = teachers.map(({ password, ...teacher }) => teacher);
+
+   const hasNext = teachersWithoutPassword.length > limit;
+   if (hasNext) teachersWithoutPassword.pop();
 
    res.json({
-      data: teachers,
+      data: teachersWithoutPassword,
       meta: { page, limit, hasNext },
    });
 });

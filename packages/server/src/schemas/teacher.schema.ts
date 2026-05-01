@@ -1,47 +1,27 @@
 import z from 'zod';
+import validationFields from './validation.fields';
+
+const {
+   schoolId, teacherId, firstName, surname, username, password, page, limit
+} = validationFields;
+
 
 export const teacherScheme = z.object({
-   firstName: z
-      .string()
-      .min(3, 'First name must be atleast 3 characters.')
-      .max(100, 'First name must not exceed 100 characters.'),
-   surname: z
-      .string()
-      .min(3, 'Second name must be atleat 3 characters.')
-      .max(100, 'Second name must not exceed 100 characters.'),
-   username: z.string()
-      .min(3, "Username must be atleast 3 characters.")
-      .max(40, "Username must not exceed 40 characters."),
-   password: z.string()
-      .min(8, "Password must be atleast 8 characters.")
-      .max(50, "Password must not axceed 50 characters.") // 50 characters after hashing it, 255 characters
+   firstName, surname, username, password
 });
 
-export const createTeacherSchema = teacherScheme.and(z.object({
-   schoolId: z.cuid2('Invalid School ID.'),
-}));
+export const createTeacherSchema = teacherScheme.and(
+   z.object({ schoolId })
+);
 
 export const updateTeacherSchema = z.object({
-   teacherId: z.cuid2('Invalid Teacher ID.'),
-   schoolId: z.cuid2('Invalid School ID.'),
-   firstName: z.string()
-      .min(3, 'First name must be atleat 3 characters.')
-      .max(100, 'First name must not exceed 100 characters.')
-      .optional(),
-   surname: z.string()
-      .min(3, 'Second name must be atleat 3 characters.')
-      .max(100, 'Second name must not exceed 100 characters.')
-      .optional(),
-   username: z.string()
-      .min(3, "Username must be atleast 3 characters.")
-      .max(40, "Username must not exceed 40 characters.").optional(),
-   password: z.string()
-      .min(8, "Password must be atleast 8 characters.")
-      .max(50, "Password must not axceed 50 characters.").optional()
+   schoolId,
+   teacherId,
+   firstName: firstName.optional(),
+   surname: surname.optional(),
+   password: password.optional()
 });
 
 export const getTeachersSchema = z.object({
-   schoolId: z.cuid2('Invalid School ID.'),
-   page: z.number().optional(),
-   limit: z.number().optional(),
+   schoolId, page, limit
 });

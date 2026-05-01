@@ -55,7 +55,7 @@ export const updateStudent = withTryCatch(async (handlers, prisma, errors) => {
    res.status(200).json(updatedStudent);
 });
 
-export const deleteStuent = withTryCatch(async (handlers, prisma, errors) => {
+export const deleteStudent = withTryCatch(async (handlers, prisma, errors) => {
    const { req, res } = handlers;
 
    const validatePayload = deleteStudentSchema.safeParse({

@@ -25,7 +25,7 @@ import {
 } from '../controllers/subject.controller';
 import {
    createStudent,
-   deleteStuent,
+   deleteStudent,
    getAllStudents,
    updateStudent,
 } from '../controllers/student.controller';
@@ -58,7 +58,7 @@ router.delete('/:schoolId/classes/:classId/subjects/:subjectId', deleteSubject);
 router.get('/:schoolId/classes/:classId/students', getAllStudents);
 router.post('/:schoolId/classes/:classId/students', createStudent);
 router.put('/:schoolId/classes/:classId/students/:studentId', updateStudent);
-router.delete('/:schoolId/classes/:classId/students/:studentId', deleteStuent);
+router.delete('/:schoolId/classes/:classId/students/:studentId', deleteStudent);
 
 router.post('/:schoolId/classes/:classId/marks', createMark);
 router.put('/:schoolId/classes/:classId/marks', updateMark);

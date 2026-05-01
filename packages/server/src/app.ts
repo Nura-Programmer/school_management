@@ -17,7 +17,7 @@ app.use(session());
 
 app.use('/api/schools', schoolRoutes);
 
-app.get('/api', (req, res) => {
+app.get('/api', (_req, res) => {
    res.send('Hello, School Management System!');
 });
 
@@ -25,7 +25,7 @@ if (process.env.ENV === 'test') {
    app.use('/api/__test__', testRoutes);
 }
 
-app.use((req, res, next) => {
+app.use((_req, res, _next) => {
    res.status(404).send("Sorry can't find that!");
 });
 

@@ -1,7 +1,7 @@
 import { createClassSchema, getClassSchema } from '../schemas/class.schema';
 import Wrapper from '../middleware/wrapper';
 
-const { withTryCatch } = new Wrapper("School");
+const { withTryCatch } = new Wrapper("Class");
 
 type Params = { schoolId: string, classId: string }
 

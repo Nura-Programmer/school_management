@@ -14,10 +14,10 @@ class Errors {
       this.res = res;
    }
 
-   conflict = (): Response => {
+   conflict = (message?: string): Response => {
       return this.res.status(409).json({
          error: 'Conflict',
-         message: `${this.name} already exist.`,
+         message: message || `${this.name} already exist.`,
       });
    };
 
@@ -28,7 +28,7 @@ class Errors {
       });
    };
 
-   validation = (message: string): Response => {
+   validation = (message: Object): Response => {
       return this.res.status(400).json({
          error: 'ValidationError',
          message,

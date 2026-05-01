@@ -51,7 +51,7 @@ export const updateTeacher = withTryCatch(async (handlers, prisma, errors) => {
 
    const { schoolId, teacherId, firstName, surname, username, password } = validation.data;
    if (!firstName && !surname && !username && !password) {
-      return errors.validation('First name, surname, username or password is required.');
+      return errors.validation('First name, surname or password is required.');
    }
 
    if (password) {
@@ -60,7 +60,7 @@ export const updateTeacher = withTryCatch(async (handlers, prisma, errors) => {
 
    const updatedTeacher = await prisma.teacher.update({
       where: { id: teacherId, schoolId },
-      data: { firstName, surname, username, password: hasPassword },
+      data: { firstName, surname, password: hasPassword },
    });
 
    res.status(200).json(updatedTeacher);
@@ -92,11 +92,11 @@ export const deleteTeacher = withTryCatch(async (handlers, prisma, errors) => {
 export const listTeachers = withTryCatch(async (handlers, prisma, errors) => {
    const { req, res } = handlers;
 
-   const validatePayload = getTeachersSchema.safeParse({
-      schoolId: req.params.schoolId,
-      page: Number(req.query.page),
-      limit: Number(req.query.limit),
-   });
+   const payload = { schoolId: req.params.schoolId } as { schoolId: string, page?: number, limit?: number };
+   if (req.query.page) payload.page = +req.query.page;
+   if (req.query.limit) payload.limit = +req.query.limit;
+
+   const validatePayload = getTeachersSchema.safeParse(payload);
    if (!validatePayload.success) {
       return errors.validation(validatePayload.error.message);
    }
